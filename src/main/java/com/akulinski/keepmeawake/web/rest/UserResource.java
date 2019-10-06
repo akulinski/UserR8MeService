@@ -3,7 +3,6 @@ package com.akulinski.keepmeawake.web.rest;
 import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
 import com.akulinski.keepmeawake.core.domain.UserDTO;
-import com.akulinski.keepmeawake.core.repository.QuestionRepository;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import com.akulinski.keepmeawake.core.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,19 +22,16 @@ public class UserResource {
 
     private final UserRepository userRepository;
 
-    private final QuestionRepository questionRepository;
-
     private final Random random;
 
-    public UserResource(UserService userService, UserRepository userRepository, QuestionRepository questionRepository) {
+    public UserResource(UserService userService, UserRepository userRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
-        this.questionRepository = questionRepository;
         random = new Random();
     }
 
     @PostMapping
-    public ResponseEntity createUser(UserDTO userDTO) {
+    public ResponseEntity createUser(@RequestBody UserDTO userDTO) {
 
         User user = userService.mapDTO(userDTO);
         userRepository.save(user);
@@ -52,6 +48,12 @@ public class UserResource {
     @GetMapping("/id/{id}")
     public ResponseEntity findById(@PathVariable("id") String id) {
         return ResponseEntity.ok(userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(String.format("No user found by id %s", id))));
+    }
+
+    @DeleteMapping("/id/{id}")
+    public ResponseEntity deleteById(@PathVariable("id") String id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/username/{username}")

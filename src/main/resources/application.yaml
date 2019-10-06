@@ -11,3 +11,7 @@ spring:
 server:
   servlet:
     context-path: /api
+
+
+jwt:
+  secret: tomeczekwodeczka
