@@ -1,8 +1,6 @@
 package com.akulinski.keepmeawake.config;
 
-import com.akulinski.keepmeawake.core.domain.Category;
-import com.akulinski.keepmeawake.core.domain.Question;
-import com.akulinski.keepmeawake.core.domain.User;
+import com.akulinski.keepmeawake.core.domain.*;
 import com.akulinski.keepmeawake.core.repository.QuestionRepository;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import com.github.javafaker.Faker;
@@ -37,7 +35,7 @@ public class FakerConfig {
 
     @EventListener(ApplicationReadyEvent.class)
     public void run() {
-        
+
         userRepository.findByUsername("admin").ifPresentOrElse((user) -> {
         }, () -> {
             User user = new User();
@@ -46,6 +44,25 @@ public class FakerConfig {
             user.setEmail("admin");
             Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
             user.setCategories(categories);
+            Set<Authority> authorities = new HashSet<>();
+            authorities.add(new Authority(AuthorityType.ADMIN));
+            authorities.add(new Authority(AuthorityType.USER));
+            user.setAuthorities(authorities);
+
+            userRepository.save(user);
+        });
+
+        userRepository.findByUsername("user").ifPresentOrElse((user) -> {
+        }, () -> {
+            User user = new User();
+            user.setPassword(passwordEncoder.encode("user"));
+            user.setUsername("user");
+            user.setEmail("user");
+            Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
+            user.setCategories(categories);
+            Set<Authority> authorities = new HashSet<>();
+            authorities.add(new Authority(AuthorityType.USER));
+            user.setAuthorities(authorities);
 
             userRepository.save(user);
         });
@@ -57,6 +74,10 @@ public class FakerConfig {
             user.setEmail(faker.yoda().quote());
             Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
             user.setCategories(categories);
+
+            Set<Authority> authorities = new HashSet<>();
+            authorities.add(new Authority(AuthorityType.USER));
+            user.setAuthorities(authorities);
 
             return user;
         }).limit(101 - userRepository.count()).forEach(userRepository::save);

@@ -1,7 +1,7 @@
 package com.akulinski.keepmeawake.core.services;
 
 import com.akulinski.keepmeawake.core.domain.Question;
-import com.akulinski.keepmeawake.core.domain.QuestionDTO;
+import com.akulinski.keepmeawake.core.domain.dto.QuestionDTO;
 import org.springframework.stereotype.Service;
 
 @Service

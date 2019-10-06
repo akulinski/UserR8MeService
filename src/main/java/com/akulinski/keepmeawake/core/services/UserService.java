@@ -2,7 +2,7 @@ package com.akulinski.keepmeawake.core.services;
 
 import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
-import com.akulinski.keepmeawake.core.domain.UserDTO;
+import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

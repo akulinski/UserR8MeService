@@ -1,5 +1,6 @@
-package com.akulinski.keepmeawake.core.domain;
+package com.akulinski.keepmeawake.core.domain.dto;
 
+import com.akulinski.keepmeawake.core.domain.Category;
 import lombok.Data;
 
 @Data

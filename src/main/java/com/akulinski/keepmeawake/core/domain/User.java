@@ -38,9 +38,11 @@ public class User implements UserDetails {
     @DBRef(lazy = true)
     private Set<Question> askedQuestions = new HashSet<>();
 
+    private Set<Authority> authorities = new HashSet<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities;
     }
 
     @Override

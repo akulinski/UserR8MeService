@@ -1,4 +1,4 @@
-package com.akulinski.keepmeawake.core.domain;
+package com.akulinski.keepmeawake.core.domain.dto;
 
 import lombok.Data;
 

@@ -6,12 +6,5 @@ spring:
       repositories:
         type: auto
 
-
-
-server:
-  servlet:
-    context-path: /api
-
-
 jwt:
-  secret: tomeczekwodeczka
+  secret: ${JWT_TOKEN:tomeczekwodeczka}

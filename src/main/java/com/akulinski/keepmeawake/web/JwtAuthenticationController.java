@@ -1,20 +1,20 @@
 package com.akulinski.keepmeawake.web;
 
-import com.akulinski.keepmeawake.utils.JwtTokenUtil;
+import com.akulinski.keepmeawake.core.domain.dto.JwtRequest;
+import com.akulinski.keepmeawake.core.domain.dto.JwtResponse;
 import com.akulinski.keepmeawake.core.services.JwtUserDetailsService;
+import com.akulinski.keepmeawake.utils.JwtTokenUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
+@RequestMapping("/api")
 public class JwtAuthenticationController {
 
     private final AuthenticationManager authenticationManager;
