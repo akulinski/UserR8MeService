@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: keepmeawake
+      repositories:
+        type: auto
+
+
+
+server:
+  servlet:
+    context-path: /api
