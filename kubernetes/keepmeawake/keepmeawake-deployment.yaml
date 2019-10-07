@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: keepmeawake
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: keepmeawake
+    spec:
+      containers:
+        - name: keepmeawake-app
+          image: docker.pkg.github.com/akulinski/keepmeawake/app:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: dev
+            - name: SPRING_DATA_MONGODB_URI
+              value: mongodb://keepmeawake-mongodb:27017
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+          ports:
+            - name: web
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: web
+            initialDelaySeconds: 180
+      imagePullSecrets:
+        - name: github
