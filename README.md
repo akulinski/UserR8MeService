@@ -1,5 +1,8 @@
 keepmeawake
 
+<img src="https://github.com/akulinski/keepmeawake/workflows/Java%20CI/badge.svg">
+
+
 
 # Mucho Importante
 
