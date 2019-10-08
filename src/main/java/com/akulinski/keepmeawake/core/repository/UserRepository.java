@@ -1,13 +1,26 @@
 package com.akulinski.keepmeawake.core.repository;
 
+import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
-@Repository
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UserRepository {
+
+    User save(User user);
 
     Optional<User> findByUsername(String username);
+
+    List<User> findAll();
+
+    Optional<User> findById(String id);
+
+    List<Question> findQuestions(User user, Set<String> questionValues);
+
+    void deleteById(String id);
+
+    int count();
+
 }

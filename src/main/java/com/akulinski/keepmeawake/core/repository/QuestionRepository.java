@@ -1,15 +1,19 @@
 package com.akulinski.keepmeawake.core.repository;
 
-import com.akulinski.keepmeawake.core.domain.Category;
 import com.akulinski.keepmeawake.core.domain.Question;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
-@Repository
-public interface QuestionRepository extends MongoRepository<Question, String> {
+public interface QuestionRepository {
 
-    List<Question> findByValueNotInAndCategoryIn(Set<String> values, Set<Category> categories);
+    List<Question> findAll();
+
+    Question save(Question question);
+
+    void deleteById(String id);
+
+    Optional<Question> findById(String id);
+
+    int count();
 }

@@ -5,9 +5,13 @@ spring:
       database: keepmeawake
       repositories:
         type: auto
+  cache:
+    type: redis
 
+jwt:
+  secret: ${JWT_TOKEN:tomeczekwodeczka}
 
-
-server:
-  servlet:
-    context-path: /api
+redis:
+  host:
+    url: localhost
+    port: 6379
