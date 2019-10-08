@@ -24,6 +24,7 @@ public class FakerConfig {
     private final UserRepository userRepository;
 
     private final QuestionRepository questionRepository;
+
     private final Faker faker = new Faker();
 
     public FakerConfig(UserRepository userRepository, QuestionRepository questionRepository, PasswordEncoder passwordEncoder) {

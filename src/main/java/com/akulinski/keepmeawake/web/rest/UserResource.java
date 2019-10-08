@@ -1,10 +1,14 @@
 package com.akulinski.keepmeawake.web.rest;
 
-import com.akulinski.keepmeawake.core.domain.*;
+import com.akulinski.keepmeawake.core.domain.Authority;
+import com.akulinski.keepmeawake.core.domain.AuthorityType;
+import com.akulinski.keepmeawake.core.domain.Question;
+import com.akulinski.keepmeawake.core.domain.User;
 import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import com.akulinski.keepmeawake.core.services.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +51,7 @@ public class UserResource {
     }
 
     @GetMapping
-    public ResponseEntity getCurrentProfile(Principal principal) {
+    public ResponseEntity<User> getCurrentProfile(Principal principal) {
         var user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new IllegalStateException(String.format("No user with username: %s", principal.getName())));
         return ResponseEntity.ok(user);
@@ -64,6 +68,7 @@ public class UserResource {
 
 
     @DeleteMapping
+    @CacheEvict(cacheNames = "users")
     public ResponseEntity deleteCurrentUser(Principal principal) {
         final var id = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName())).getId();
 
@@ -76,39 +81,40 @@ public class UserResource {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity getAll() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/id/{id}")
     public ResponseEntity findById(@PathVariable("id") String id) {
         return ResponseEntity.ok(userRepository.findById(id).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by id %s", id)));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/id/{id}")
+    @CacheEvict(cacheNames = "users ")
     public ResponseEntity deleteById(@PathVariable("id") String id) {
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/username/{username}")
     public ResponseEntity findByUsername(@PathVariable("username") String username) {
         return ResponseEntity.ok(userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username)));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/questions/{username}")
     public ResponseEntity getUserQuestions(@PathVariable("username") String username) {
         return ResponseEntity.ok(userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username)).getAskedQuestions());
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/questions/random/{username}")
     public ResponseEntity getQuestionForUser(@PathVariable("username") String username) {
         User user = userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username));

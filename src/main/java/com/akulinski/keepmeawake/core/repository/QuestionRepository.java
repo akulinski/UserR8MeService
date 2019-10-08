@@ -1,9 +1,19 @@
 package com.akulinski.keepmeawake.core.repository;
 
 import com.akulinski.keepmeawake.core.domain.Question;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface QuestionRepository extends MongoRepository<Question, String> {
+import java.util.List;
+import java.util.Optional;
+
+public interface QuestionRepository {
+
+    List<Question> findAll();
+
+    Question save(Question question);
+
+    void deleteById(String id);
+
+    Optional<Question> findById(String id);
+
+    int count();
 }

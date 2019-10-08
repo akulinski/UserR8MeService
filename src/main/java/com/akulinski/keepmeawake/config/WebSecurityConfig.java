@@ -52,9 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().authorizeRequests()
-                .antMatchers("/api/auth")
-                .permitAll()
-                .antMatchers("/actuator/health")
+                .antMatchers("/api/auth", "/actuator/health")
                 .permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler)

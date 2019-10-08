@@ -13,7 +13,7 @@ spec:
       containers:
         - name: keepmeawake-app
           image: docker.pkg.github.com/akulinski/keepmeawake/app:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: dev
@@ -32,11 +32,25 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: web
+              port: 8080
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: web
+              port: 8080
             initialDelaySeconds: 180
       imagePullSecrets:
         - name: github
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keepmeawake
+  namespace: default
+  labels:
+    app: keepmeawake
+spec:
+  selector:
+    app: keepmeawake
+  ports:
+    - name: web
+      port: 8080
