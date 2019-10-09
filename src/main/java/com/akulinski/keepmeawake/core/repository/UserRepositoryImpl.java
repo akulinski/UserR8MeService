@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,8 +20,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final MongoTemplate mongoTemplate;
 
-    public UserRepositoryImpl(MongoTemplate mongoTemplate) {
+    private final RedisTemplate<String, User> redisTemplate;
+
+    public UserRepositoryImpl(MongoTemplate mongoTemplate, RedisTemplate redisTemplate) {
         this.mongoTemplate = mongoTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @CachePut(cacheNames = "users", key = "#user.id")
@@ -31,11 +35,20 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
+        final var userRedis = redisTemplate.opsForHash().get("users", username);
 
-        Query query = new Query();
-        query.addCriteria(Criteria.where("username").is(username));
+        if (userRedis == null) {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("username").is(username));
 
-        return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
+            final var one = mongoTemplate.findOne(query, User.class);
+
+            redisTemplate.opsForHash().put("users", username, one);
+
+            return Optional.ofNullable(one);
+        }
+
+        return Optional.of((User) userRedis);
     }
 
     @Cacheable(cacheNames = "users")

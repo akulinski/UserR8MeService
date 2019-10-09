@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        tier: backend
+    spec:
+      volumes:
+        - name: data
+          emptyDir: {}
+      containers:
+        - name: redis
+          image: kubernetes/redis:v1
+          ports:
+            - containerPort: 6379
+          # Mount the volume into the pod
+          volumeMounts:
+            - mountPath: /redis-master-data
+              name: data   # must match the name of the volume, above
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keepmeawake-redis
+  namespace: default
+spec:
+  selector:
+    app: keepmeawake-redis
+  ports:
+    - port: 27017
+

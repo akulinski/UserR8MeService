@@ -19,6 +19,8 @@ spec:
               value: dev
             - name: SPRING_DATA_MONGODB_URI
               value: mongodb://keepmeawake-mongodb:27017
+            - name: REDIS_HOST_URL
+              value: keepmeawake-redis
           resources:
             requests:
               memory: "256Mi"
