@@ -1,6 +1,8 @@
 package com.akulinski.keepmeawake.web.rest;
 
 import com.akulinski.keepmeawake.core.domain.dto.ExceptionDTO;
+import com.akulinski.keepmeawake.core.repository.DuplicateValueException;
+import com.mongodb.MongoWriteException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +17,14 @@ import java.util.Date;
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
-    protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
+    public ResponseEntity handleConflict(RuntimeException ex, WebRequest request) {
         ExceptionDTO exceptionDTO = new ExceptionDTO("Internal Application Error ", new Date().toInstant());
         return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
+    @ExceptionHandler(value = {MongoWriteException.class})
+    public ResponseEntity handleDuplicateKey(MongoWriteException ex, WebRequest request){
+        ExceptionDTO exceptionDTO = new ExceptionDTO(ex.getMessage(), new Date().toInstant());
+        return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
 }

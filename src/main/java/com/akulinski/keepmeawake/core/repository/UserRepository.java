@@ -9,7 +9,7 @@ import java.util.Set;
 
 public interface UserRepository {
 
-    User save(User user);
+    User save(User user) throws DuplicateValueException;
 
     Optional<User> findByUsername(String username);
 
@@ -22,5 +22,9 @@ public interface UserRepository {
     void deleteById(String id);
 
     int count();
+
+    boolean isLinkPresent(String link);
+
+    Optional<User> findUserByLink(String link);
 
 }

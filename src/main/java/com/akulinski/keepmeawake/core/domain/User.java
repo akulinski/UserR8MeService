@@ -2,11 +2,14 @@ package com.akulinski.keepmeawake.core.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,27 +22,41 @@ import java.util.Set;
 
 @Document
 @Data
-public class User implements UserDetails, Serializable {
+public class User implements UserDetails, Serializable, Persistable<String> {
 
     @Id
     private String id;
 
-    @Indexed
+    @Indexed(unique = true)
     private String username;
 
     @JsonIgnore
+    @Field
     private String password;
 
     @Email
+    @Indexed(unique = true)
     private String email;
 
+    @CreatedDate
     private Instant created;
 
+    @LastModifiedDate
+    private Instant modificationDate;
+
+    @Indexed
+    private String link;
+
+    @Field
+    private Boolean isEnabled;
+
+    @Field
     private Set<Category> categories = new HashSet<>();
 
     @DBRef(lazy = true)
     private Set<Question> askedQuestions = new HashSet<>();
 
+    @Field
     private Set<Authority> authorities = new HashSet<>();
 
     @Override
@@ -64,6 +81,11 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
+    }
+
+    @Override
+    public boolean isNew() {
+        return !isEnabled;
     }
 }

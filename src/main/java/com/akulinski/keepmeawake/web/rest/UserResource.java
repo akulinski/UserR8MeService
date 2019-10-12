@@ -1,12 +1,13 @@
 package com.akulinski.keepmeawake.web.rest;
 
-import com.akulinski.keepmeawake.core.domain.Authority;
-import com.akulinski.keepmeawake.core.domain.AuthorityType;
 import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
+import com.akulinski.keepmeawake.core.domain.dto.ChangePasswordDTO;
 import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
+import com.akulinski.keepmeawake.core.services.EmailService;
 import com.akulinski.keepmeawake.core.services.UserService;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +15,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * User related endpoints
+ */
 @RestController
 @RequestMapping("/api/v1/user")
 @Slf4j
 public class UserResource {
+
+    private final EmailService emailService;
 
     private final UserService userService;
 
@@ -31,25 +36,36 @@ public class UserResource {
 
     private final Random random;
 
-    public UserResource(UserService userService, UserRepository userRepository) {
+    public UserResource(EmailService emailService, UserService userService, UserRepository userRepository) {
+        this.emailService = emailService;
         this.userService = userService;
         this.userRepository = userRepository;
         random = new Random();
     }
 
+    /**
+     * Creates new user, no mail
+     * confirmation implemented yet
+     *
+     * @param userDTO
+     * @return
+     */
     @PostMapping
-    public ResponseEntity createUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity createUser(@RequestBody UserDTO userDTO) throws UnirestException {
 
-        User user = userService.mapDTO(userDTO);
-        Set<Authority> authorities = new HashSet<>();
-        authorities.add(new Authority(AuthorityType.USER));
-        user.setAuthorities(authorities);
+        User user = userService.getUser(userDTO);
 
-        userRepository.save(user);
-
+        emailService.sendMessage(user.getEmail(), user.getUsername(), user.getLink(), "All Best, KeepMeAwake Team");
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Returns user profile based
+     * on jwt token
+     *
+     * @param principal
+     * @return
+     */
     @GetMapping
     public ResponseEntity<User> getCurrentProfile(Principal principal) {
         var user = userRepository.findByUsername(principal.getName())
@@ -57,6 +73,29 @@ public class UserResource {
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Change password endpoint
+     * when current password matches old password
+     * from changepassworddto new password is set
+     * @param principal
+     * @param changePasswordDTO
+     * @return
+     */
+    @PutMapping
+    public ResponseEntity<User> changePassword(Principal principal, @RequestBody ChangePasswordDTO changePasswordDTO) {
+        final var name = principal.getName();
+
+        User user = userService.changePassword(name, changePasswordDTO);
+
+        return ResponseEntity.ok(user);
+    }
+
+    /**
+     * Generates question for user
+     *
+     * @param principal
+     * @return
+     */
     @GetMapping("/questions/random")
     public ResponseEntity getQuestionForCurrentUser(Principal principal) {
         User user = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
@@ -81,6 +120,13 @@ public class UserResource {
     }
 
 
+    /**
+     * Returns all users
+     * Admin authority is needed
+     * for user
+     *
+     * @return
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity getAll() {
@@ -124,6 +170,17 @@ public class UserResource {
     }
 
 
+    /**
+     * Returns question for user
+     * Question is choosen by quering db
+     * for all questions that are in user categories
+     * and user has not replied for those. If no
+     * entries are returned from query random question
+     * is choosen from user questions
+     *
+     * @param user
+     * @return
+     */
     private Question getQuestion(User user) {
         Set<String> questionValues = user.getAskedQuestions().stream().map(Question::getValue).collect(Collectors.toSet());
 

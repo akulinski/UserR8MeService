@@ -1,13 +1,21 @@
 version: '2'
 services:
   keepmeawake-app:
+
     image: docker.pkg.github.com/akulinski/keepmeawake/app:latest
 
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://keepmeawake-mongodb:27017
+      - REDIS_HOST_URL=keepmeawake-redis
+
     ports:
       - 8080:8080
   keepmeawake-mongodb:
     extends:
       file: mongo.yaml
       service: keepmeawake-mongodb
+
+  keepmeawake-redis:
+    extends:
+      file: redis.yaml
+      service: redis
