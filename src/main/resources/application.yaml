@@ -21,8 +21,8 @@ redis:
 
 
 config:
-  apiKey: ${APIKEY}
-  from: czarny.grzybiarz@gmail.com
+  apiKey: ${APIKEY:defaultvalue}
+  from: welcome@keepmeawake.com
   domain: ak.keepmeawake.com
   address: localhost
   port: 8080
