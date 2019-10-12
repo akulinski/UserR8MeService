@@ -35,7 +35,7 @@ public class User implements UserDetails, Serializable, Persistable<String> {
     private String password;
 
     @Email
-    @Indexed
+    @Indexed(unique = true)
     private String email;
 
     @CreatedDate

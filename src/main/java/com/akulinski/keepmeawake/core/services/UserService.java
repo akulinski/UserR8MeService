@@ -4,6 +4,7 @@ import com.akulinski.keepmeawake.core.domain.Authority;
 import com.akulinski.keepmeawake.core.domain.AuthorityType;
 import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
+import com.akulinski.keepmeawake.core.domain.dto.ChangePasswordDTO;
 import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -36,15 +38,8 @@ public class UserService {
         return user;
     }
 
-    private String getLinkThatIsNotPresent() {
-        var link = RandomStringUtils.randomAlphanumeric(30);
-        boolean linkPresent = userRepository.isLinkPresent(link);
-
-        while (linkPresent){
-            link = RandomStringUtils.randomAlphanumeric(30);
-            linkPresent = userRepository.isLinkPresent(link);
-        }
-        return link;
+    private String getLinkThatIsNotPresent(String id) {
+        return RandomStringUtils.randomAlphanumeric(30) + id;
     }
 
 
@@ -54,7 +49,7 @@ public class UserService {
         authorities.add(new Authority(AuthorityType.USER));
         user.setAuthorities(authorities);
 
-        String link = getLinkThatIsNotPresent();
+        String link = getLinkThatIsNotPresent(user.getId());
 
         user.setLink(link);
 
@@ -80,5 +75,14 @@ public class UserService {
         return question;
     }
 
+    public User changePassword(String username, ChangePasswordDTO changePasswordDTO){
+        final var byUsername = userRepository.findByUsername(username).orElseThrow(()->new IllegalArgumentException(String.format("No user found with username: %s", username)));
 
+        if(byUsername.getPassword().equals(passwordEncoder.encode(changePasswordDTO.getOldPassword()))){
+            byUsername.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+            userRepository.save(byUsername);
+        }
+
+        return byUsername;
+    }
 }

@@ -1,23 +1,20 @@
 package com.akulinski.keepmeawake.web.rest;
 
-import com.akulinski.keepmeawake.core.domain.Authority;
-import com.akulinski.keepmeawake.core.domain.AuthorityType;
 import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
+import com.akulinski.keepmeawake.core.domain.dto.ChangePasswordDTO;
 import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import com.akulinski.keepmeawake.core.services.EmailService;
 import com.akulinski.keepmeawake.core.services.UserService;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -49,6 +46,7 @@ public class UserResource {
     /**
      * Creates new user, no mail
      * confirmation implemented yet
+     *
      * @param userDTO
      * @return
      */
@@ -64,6 +62,7 @@ public class UserResource {
     /**
      * Returns user profile based
      * on jwt token
+     *
      * @param principal
      * @return
      */
@@ -75,7 +74,25 @@ public class UserResource {
     }
 
     /**
+     * Change password endpoint
+     * when current password matches old password
+     * from changepassworddto new password is set
+     * @param principal
+     * @param changePasswordDTO
+     * @return
+     */
+    @PutMapping
+    public ResponseEntity<User> changePassword(Principal principal, @RequestBody ChangePasswordDTO changePasswordDTO) {
+        final var name = principal.getName();
+
+        User user = userService.changePassword(name, changePasswordDTO);
+
+        return ResponseEntity.ok(user);
+    }
+
+    /**
      * Generates question for user
+     *
      * @param principal
      * @return
      */
@@ -107,6 +124,7 @@ public class UserResource {
      * Returns all users
      * Admin authority is needed
      * for user
+     *
      * @return
      */
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -153,12 +171,13 @@ public class UserResource {
 
 
     /**
-     *  Returns question for user
-     *  Question is choosen by quering db
-     *  for all questions that are in user categories
-     *  and user has not replied for those. If no
-     *  entries are returned from query random question
-     *  is choosen from user questions
+     * Returns question for user
+     * Question is choosen by quering db
+     * for all questions that are in user categories
+     * and user has not replied for those. If no
+     * entries are returned from query random question
+     * is choosen from user questions
+     *
      * @param user
      * @return
      */
