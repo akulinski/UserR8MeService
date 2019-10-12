@@ -33,8 +33,13 @@ public class UserRepositoryImpl implements UserRepository {
 
     @CachePut(cacheNames = "users", key = "#user.id")
     @Override
-    public User save(User user) {
-        return mongoTemplate.save(user);
+    public User save(User user) throws DuplicateValueException {
+        User save = mongoTemplate.save(user);
+
+        if(save == null){
+            throw new DuplicateValueException(String.format("User with username: %s or email: %s exists", user.getUsername(), user.getEmail()));
+        }
+        return save;
     }
 
     @Override
@@ -82,6 +87,21 @@ public class UserRepositoryImpl implements UserRepository {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(id));
         mongoTemplate.remove(query, User.class);
+    }
+
+    public boolean isLinkPresent(String link){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("link").is(link));
+
+        return mongoTemplate.findOne(query, User.class) != null;
+    }
+
+    @Override
+    public Optional<User> findUserByLink(String link) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("link").is(link));
+
+        return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
     }
 
     @Override

@@ -6,8 +6,11 @@ import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
 import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
+import com.akulinski.keepmeawake.core.services.EmailService;
 import com.akulinski.keepmeawake.core.services.UserService;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,13 +31,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserResource {
 
+    private final EmailService emailService;
+
     private final UserService userService;
 
     private final UserRepository userRepository;
 
     private final Random random;
 
-    public UserResource(UserService userService, UserRepository userRepository) {
+    public UserResource(EmailService emailService, UserService userService, UserRepository userRepository) {
+        this.emailService = emailService;
         this.userService = userService;
         this.userRepository = userRepository;
         random = new Random();
@@ -47,15 +53,11 @@ public class UserResource {
      * @return
      */
     @PostMapping
-    public ResponseEntity createUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity createUser(@RequestBody UserDTO userDTO) throws UnirestException {
 
-        User user = userService.mapDTO(userDTO);
-        Set<Authority> authorities = new HashSet<>();
-        authorities.add(new Authority(AuthorityType.USER));
-        user.setAuthorities(authorities);
+        User user = userService.getUser(userDTO);
 
-        userRepository.save(user);
-
+        emailService.sendMessage(user.getEmail(), user.getUsername(), user.getLink(), "All Best, KeepMeAwake Team");
         return ResponseEntity.ok(user);
     }
 
