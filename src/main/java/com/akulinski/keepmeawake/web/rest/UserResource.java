@@ -20,6 +20,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * User related endpoints
+ */
 @RestController
 @RequestMapping("/api/v1/user")
 @Slf4j
@@ -37,6 +40,12 @@ public class UserResource {
         random = new Random();
     }
 
+    /**
+     * Creates new user, no mail
+     * confirmation implemented yet
+     * @param userDTO
+     * @return
+     */
     @PostMapping
     public ResponseEntity createUser(@RequestBody UserDTO userDTO) {
 
@@ -50,6 +59,12 @@ public class UserResource {
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Returns user profile based
+     * on jwt token
+     * @param principal
+     * @return
+     */
     @GetMapping
     public ResponseEntity<User> getCurrentProfile(Principal principal) {
         var user = userRepository.findByUsername(principal.getName())
@@ -57,6 +72,11 @@ public class UserResource {
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Generates question for user
+     * @param principal
+     * @return
+     */
     @GetMapping("/questions/random")
     public ResponseEntity getQuestionForCurrentUser(Principal principal) {
         User user = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
@@ -81,6 +101,12 @@ public class UserResource {
     }
 
 
+    /**
+     * Returns all users
+     * Admin authority is needed
+     * for user
+     * @return
+     */
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity getAll() {
@@ -124,6 +150,16 @@ public class UserResource {
     }
 
 
+    /**
+     *  Returns question for user
+     *  Question is choosen by quering db
+     *  for all questions that are in user categories
+     *  and user has not replied for those. If no
+     *  entries are returned from query random question
+     *  is choosen from user questions
+     * @param user
+     * @return
+     */
     private Question getQuestion(User user) {
         Set<String> questionValues = user.getAskedQuestions().stream().map(Question::getValue).collect(Collectors.toSet());
 

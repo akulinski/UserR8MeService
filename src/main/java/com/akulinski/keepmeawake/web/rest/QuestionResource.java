@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Question related endpoints
+ *
+ */
+
 @RestController
 @RequestMapping("/api/v1/question")
 @Slf4j
@@ -27,6 +32,11 @@ public class QuestionResource {
         this.questionService = questionService;
     }
 
+    /**
+     * Returns All questions but needs
+     * authority admin
+     * @return
+     */
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     @Cacheable(cacheNames = "questions")

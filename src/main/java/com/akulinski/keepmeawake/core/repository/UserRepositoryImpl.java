@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Custom implementation of repository
+ * due to cacheing problem
+ */
 @Component
 public class UserRepositoryImpl implements UserRepository {
 

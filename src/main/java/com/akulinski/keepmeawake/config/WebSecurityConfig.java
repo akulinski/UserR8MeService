@@ -49,6 +49,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    /**
+     * All endpoints except auth and health
+     * are protected
+     * @param httpSecurity
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().authorizeRequests()

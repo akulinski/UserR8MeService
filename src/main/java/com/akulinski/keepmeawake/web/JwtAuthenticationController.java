@@ -12,6 +12,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ *  Authentication controller, when called
+ *  with request body matching user returns
+ *  JWT token
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/api")
@@ -27,6 +32,13 @@ public class JwtAuthenticationController {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Endpoint That generates jwt token
+     * @param authenticationRequest
+     * @return
+     * @throws Exception
+     */
+    //TODO loadUserByUser gets called twice
     @PostMapping(value = "/auth")
     public ResponseEntity createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
