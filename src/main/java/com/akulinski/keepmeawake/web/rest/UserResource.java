@@ -1,8 +1,10 @@
 package com.akulinski.keepmeawake.web.rest;
 
-import com.akulinski.keepmeawake.core.domain.Question;
+import com.akulinski.keepmeawake.core.domain.Comment;
 import com.akulinski.keepmeawake.core.domain.User;
 import com.akulinski.keepmeawake.core.domain.dto.ChangePasswordDTO;
+import com.akulinski.keepmeawake.core.domain.dto.CommentDTO;
+import com.akulinski.keepmeawake.core.domain.dto.RateDTO;
 import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import com.akulinski.keepmeawake.core.services.EmailService;
@@ -10,15 +12,13 @@ import com.akulinski.keepmeawake.core.services.UserService;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Random;
-import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * User related endpoints
@@ -34,13 +34,10 @@ public class UserResource {
 
     private final UserRepository userRepository;
 
-    private final Random random;
-
     public UserResource(EmailService emailService, UserService userService, UserRepository userRepository) {
         this.emailService = emailService;
         this.userService = userService;
         this.userRepository = userRepository;
-        random = new Random();
     }
 
     /**
@@ -77,6 +74,7 @@ public class UserResource {
      * Change password endpoint
      * when current password matches old password
      * from changepassworddto new password is set
+     *
      * @param principal
      * @param changePasswordDTO
      * @return
@@ -90,19 +88,49 @@ public class UserResource {
         return ResponseEntity.ok(user);
     }
 
-    /**
-     * Generates question for user
-     *
-     * @param principal
-     * @return
-     */
-    @GetMapping("/questions/random")
-    public ResponseEntity getQuestionForCurrentUser(Principal principal) {
-        User user = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
 
-        Question chosenQuestion = getQuestion(user);
+    @PostMapping("/rate")
+    private ResponseEntity rateUser(@RequestBody RateDTO rateDTO, Principal principal) {
+        final var toRate = userRepository.findByUsername(rateDTO.getReceiver()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", rateDTO.getReceiver()));
+        final var rater = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
 
-        return ResponseEntity.ok(chosenQuestion);
+        userService.addRateToUser(rateDTO, toRate, rater);
+        userRepository.save(toRate);
+
+        return ResponseEntity.ok(toRate);
+    }
+
+    @PostMapping("/comment")
+    private ResponseEntity commentUser(@RequestBody CommentDTO commentDTO, Principal principal) {
+
+        final var receiver = userRepository.findByUsername(commentDTO.getReceiver())
+                .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", commentDTO.getReceiver()));
+
+        final var poster = userRepository.findByUsername(principal.getName())
+                .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
+
+        Comment comment = createAndSaveComment(commentDTO, receiver, poster);
+
+        return ResponseEntity.ok(comment);
+    }
+
+    private Comment createAndSaveComment(@RequestBody CommentDTO commentDTO, User receiver, User poster) {
+        Comment comment = new Comment();
+        comment.setComment(commentDTO.getComment());
+        comment.setCommenter(poster.getUsername());
+
+        receiver.getComments().add(comment);
+        userRepository.save(receiver);
+        return comment;
+    }
+
+    @GetMapping("/get-rating")
+    public ResponseEntity getRating(Principal principal) {
+        final var byUsername = userRepository.findByUsername(principal.getName())
+                .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
+
+        final Integer sum = userService.getSum(byUsername);
+        return ResponseEntity.ok(sum);
     }
 
 
@@ -141,7 +169,7 @@ public class UserResource {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/id/{id}")
-    @CacheEvict(cacheNames = "users ")
+    @CacheEvict(cacheNames = "users")
     public ResponseEntity deleteById(@PathVariable("id") String id) {
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -151,51 +179,6 @@ public class UserResource {
     @GetMapping("/username/{username}")
     public ResponseEntity findByUsername(@PathVariable("username") String username) {
         return ResponseEntity.ok(userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username)));
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/questions/{username}")
-    public ResponseEntity getUserQuestions(@PathVariable("username") String username) {
-        return ResponseEntity.ok(userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username)).getAskedQuestions());
-    }
-
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/questions/random/{username}")
-    public ResponseEntity getQuestionForUser(@PathVariable("username") String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username));
-        Question chosenQuestion = getQuestion(user);
-
-        return ResponseEntity.ok(chosenQuestion);
-    }
-
-
-    /**
-     * Returns question for user
-     * Question is choosen by quering db
-     * for all questions that are in user categories
-     * and user has not replied for those. If no
-     * entries are returned from query random question
-     * is choosen from user questions
-     *
-     * @param user
-     * @return
-     */
-    private Question getQuestion(User user) {
-        Set<String> questionValues = user.getAskedQuestions().stream().map(Question::getValue).collect(Collectors.toSet());
-
-
-        Question chosenQuestion;
-
-        try {
-            chosenQuestion = userService.choseQuestion(user, questionValues);
-        } catch (IllegalStateException ex) {
-            log.warn(ex.getMessage());
-            chosenQuestion = user.getAskedQuestions().stream()
-                    .skip(random.nextInt(user.getAskedQuestions().size() - 1))
-                    .findAny().orElseThrow(() -> new IllegalStateException("User has no questions"));
-        }
-        return chosenQuestion;
     }
 
 }

@@ -2,7 +2,6 @@ package com.akulinski.keepmeawake.core.repository;
 
 import com.akulinski.keepmeawake.core.domain.Authority;
 import com.akulinski.keepmeawake.core.domain.AuthorityType;
-import com.akulinski.keepmeawake.core.domain.Category;
 import com.akulinski.keepmeawake.core.domain.User;
 import com.github.javafaker.Faker;
 import org.junit.Test;
@@ -14,7 +13,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -43,9 +41,6 @@ public class UserRepositoryImplTest {
             user.setUsername(faker.name().username());
             user.setPassword(faker.name().nameWithMiddle());
             user.setEmail(faker.yoda().quote());
-            Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
-            user.setCategories(categories);
-
             Set<Authority> authorities = new HashSet<>();
             authorities.add(new Authority(AuthorityType.USER));
             user.setAuthorities(authorities);
@@ -63,8 +58,6 @@ public class UserRepositoryImplTest {
         user.setUsername(faker.name().username());
         user.setPassword(faker.name().nameWithMiddle());
         user.setEmail(faker.yoda().quote());
-        Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
-        user.setCategories(categories);
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));
@@ -84,8 +77,6 @@ public class UserRepositoryImplTest {
             user.setUsername(faker.name().username());
             user.setPassword(faker.name().nameWithMiddle());
             user.setEmail(faker.yoda().quote());
-            Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
-            user.setCategories(categories);
 
             Set<Authority> authorities = new HashSet<>();
             authorities.add(new Authority(AuthorityType.USER));
@@ -105,8 +96,6 @@ public class UserRepositoryImplTest {
         user.setUsername(faker.name().username());
         user.setPassword(faker.name().nameWithMiddle());
         user.setEmail(faker.yoda().quote());
-        Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
-        user.setCategories(categories);
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));
@@ -119,14 +108,10 @@ public class UserRepositoryImplTest {
 
     @Test
     public void deleteById() {
-
-
         User user = new User();
         user.setUsername(faker.name().username());
         user.setPassword(faker.name().nameWithMiddle());
         user.setEmail(faker.yoda().quote());
-        Set<Category> categories = new HashSet<>(Arrays.asList(Category.values()));
-        user.setCategories(categories);
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));

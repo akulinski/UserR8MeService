@@ -1,6 +1,5 @@
 package com.akulinski.keepmeawake.core.repository;
 
-import com.akulinski.keepmeawake.core.domain.Question;
 import com.akulinski.keepmeawake.core.domain.User;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Custom implementation of repository
@@ -36,7 +34,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(User user) throws DuplicateValueException {
         User save = mongoTemplate.save(user);
 
-        if(save == null){
+        if (save == null) {
             throw new DuplicateValueException(String.format("User with username: %s or email: %s exists", user.getUsername(), user.getEmail()));
         }
         return save;
@@ -74,12 +72,6 @@ public class UserRepositoryImpl implements UserRepository {
         return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
     }
 
-    @Cacheable(cacheNames = "questions-query", key = "#user.id")
-    public List<Question> findQuestions(User user, Set<String> questionValues) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("value").nin(questionValues).and("category").in(user.getCategories()));
-        return mongoTemplate.find(query, Question.class);
-    }
 
     @Override
     @CacheEvict(cacheNames = "users", allEntries = true)
@@ -89,7 +81,7 @@ public class UserRepositoryImpl implements UserRepository {
         mongoTemplate.remove(query, User.class);
     }
 
-    public boolean isLinkPresent(String link){
+    public boolean isLinkPresent(String link) {
         Query query = new Query();
         query.addCriteria(Criteria.where("link").is(link));
 

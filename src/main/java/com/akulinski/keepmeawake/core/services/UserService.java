@@ -2,19 +2,19 @@ package com.akulinski.keepmeawake.core.services;
 
 import com.akulinski.keepmeawake.core.domain.Authority;
 import com.akulinski.keepmeawake.core.domain.AuthorityType;
-import com.akulinski.keepmeawake.core.domain.Question;
+import com.akulinski.keepmeawake.core.domain.Rate;
 import com.akulinski.keepmeawake.core.domain.User;
 import com.akulinski.keepmeawake.core.domain.dto.ChangePasswordDTO;
+import com.akulinski.keepmeawake.core.domain.dto.RateDTO;
 import com.akulinski.keepmeawake.core.domain.dto.UserDTO;
 import com.akulinski.keepmeawake.core.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -58,31 +58,33 @@ public class UserService {
         return user;
     }
 
-    public Question choseQuestion(User user, Set<String> questionValues) {
+    public User changePassword(String username, ChangePasswordDTO changePasswordDTO) {
+        final var byUsername = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", username)));
 
-        List<Question> byValueNotInAndCategoryIn = userRepository.findQuestions(user, questionValues);
-
-        if (byValueNotInAndCategoryIn.isEmpty()) {
-            throw new IllegalStateException("No new questions for user");
-        }
-
-        final Question question = byValueNotInAndCategoryIn.get(0);
-
-        user.getAskedQuestions().add(question);
-
-        userRepository.save(user);
-
-        return question;
-    }
-
-    public User changePassword(String username, ChangePasswordDTO changePasswordDTO){
-        final var byUsername = userRepository.findByUsername(username).orElseThrow(()->new IllegalArgumentException(String.format("No user found with username: %s", username)));
-
-        if(byUsername.getPassword().equals(passwordEncoder.encode(changePasswordDTO.getOldPassword()))){
+        if (byUsername.getPassword().equals(passwordEncoder.encode(changePasswordDTO.getOldPassword()))) {
             byUsername.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
             userRepository.save(byUsername);
         }
 
         return byUsername;
+    }
+
+
+    public void addRateToUser(@RequestBody RateDTO rateDTO, User toRate, User rater) {
+        Rate rate = new Rate();
+        rate.setRate(rateDTO.getRating());
+        rate.setSender(rater.getUsername());
+        toRate.getRates().add(rate);
+    }
+
+
+    @Cacheable(cacheNames = "rating", key = "#byUsername.id")
+    public Integer getSum(User byUsername) {
+        final var sum = byUsername.getRates().stream()
+                .map(Rate::getRate).reduce(Integer::sum).orElse(-1);
+        byUsername.setCurrentRating(sum);
+
+        userRepository.save(byUsername);
+        return sum;
     }
 }

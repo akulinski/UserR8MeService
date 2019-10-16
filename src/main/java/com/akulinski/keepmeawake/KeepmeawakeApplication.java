@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableMongoAuditing
 public class KeepmeawakeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(KeepmeawakeApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(KeepmeawakeApplication.class, args);
+    }
 
 }

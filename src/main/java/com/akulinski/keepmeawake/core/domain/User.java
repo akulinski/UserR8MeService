@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,7 +34,9 @@ public class User implements UserDetails, Serializable, Persistable<String> {
     private String password;
 
     @Email
+/*
     @Indexed(unique = true)
+*/
     private String email;
 
     @CreatedDate
@@ -48,13 +49,17 @@ public class User implements UserDetails, Serializable, Persistable<String> {
     private String link;
 
     @Field
-    private Boolean isEnabled;
+    private Boolean isEnabled = Boolean.TRUE;
 
     @Field
-    private Set<Category> categories = new HashSet<>();
+    private Set<Rate> rates = new HashSet<>();
 
-    @DBRef(lazy = true)
-    private Set<Question> askedQuestions = new HashSet<>();
+    //-1 means no rates assigned
+    @Field
+    private Integer currentRating = -1;
+
+    @Field
+    private Set<Comment> comments = new HashSet<>();
 
     @Field
     private Set<Authority> authorities = new HashSet<>();
