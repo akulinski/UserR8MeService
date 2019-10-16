@@ -12,7 +12,6 @@ import com.akulinski.keepmeawake.core.services.UserService;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -90,7 +89,7 @@ public class UserResource {
 
 
     @PostMapping("/rate")
-    private ResponseEntity rateUser(@RequestBody RateDTO rateDTO, Principal principal) {
+    public ResponseEntity rateUser(@RequestBody RateDTO rateDTO, Principal principal) {
         final var toRate = userRepository.findByUsername(rateDTO.getReceiver()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", rateDTO.getReceiver()));
         final var rater = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
 
@@ -101,7 +100,7 @@ public class UserResource {
     }
 
     @PostMapping("/comment")
-    private ResponseEntity commentUser(@RequestBody CommentDTO commentDTO, Principal principal) {
+    public ResponseEntity commentUser(@RequestBody CommentDTO commentDTO, Principal principal) {
 
         final var receiver = userRepository.findByUsername(commentDTO.getReceiver())
                 .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", commentDTO.getReceiver()));
