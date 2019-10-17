@@ -20,6 +20,17 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+            <version>2.1.9.RELEASE</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -195,7 +206,8 @@
                             <goal>push</goal>
                         </goals>
                         <configuration>
-                            <imageName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}</imageName>
+                            <imageName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}
+                            </imageName>
                         </configuration>
                     </execution>
                 </executions>
