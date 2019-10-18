@@ -10,4 +10,6 @@ public class Rate implements Serializable {
     private Integer rate;
 
     private String sender;
+
+    private String question;
 }

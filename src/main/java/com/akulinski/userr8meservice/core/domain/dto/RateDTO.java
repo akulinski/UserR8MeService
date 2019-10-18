@@ -6,4 +6,5 @@ import lombok.Data;
 public class RateDTO {
     private String receiver;
     private Integer rating;
+    private String question;
 }
