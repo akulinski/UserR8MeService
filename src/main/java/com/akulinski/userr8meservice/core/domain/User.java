@@ -15,9 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Document
 @Data
@@ -53,6 +51,8 @@ public class User implements UserDetails, Serializable, Persistable<String> {
 
     @Field
     private Set<Rate> rates = new HashSet<>();
+
+    private Map<String, Double> ratesMap = new HashMap();
 
     //-1 means no rates assigned
     @Field

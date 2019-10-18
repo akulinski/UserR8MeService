@@ -94,7 +94,6 @@ public class UserResource {
         final var rater = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
 
         userService.addRateToUser(rateDTO, toRate, rater);
-        userRepository.save(toRate);
 
         return ResponseEntity.ok(toRate);
     }

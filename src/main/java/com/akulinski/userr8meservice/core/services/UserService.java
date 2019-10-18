@@ -9,28 +9,27 @@ import com.akulinski.userr8meservice.core.domain.dto.RateDTO;
 import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-
-    private final RabbitService rabbitService;
 
     private PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, RabbitService rabbitService) {
+    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.rabbitService = rabbitService;
     }
 
     public User mapDTO(UserDTO userDTO) {
@@ -79,7 +78,14 @@ public class UserService {
         rate.setRate(rateDTO.getRating());
         rate.setSender(rater.getUsername());
         toRate.getRates().add(rate);
-        rabbitService.calculateUserStats(toRate);
+
+        Map<String, List<Rate>> grouped = toRate.getRates().stream().collect(Collectors.groupingBy(Rate::getQuestion));
+        grouped.forEach((s, rates) -> {
+            double average = rates.stream().mapToInt(Rate::getRate).average().getAsDouble();
+            toRate.getRatesMap().put(s, average);
+        });
+
+        userRepository.save(toRate);
     }
 
 

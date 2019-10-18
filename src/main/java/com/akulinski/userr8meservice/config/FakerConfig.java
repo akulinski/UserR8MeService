@@ -2,10 +2,8 @@ package com.akulinski.userr8meservice.config;
 
 import com.akulinski.userr8meservice.core.domain.*;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
-import com.akulinski.userr8meservice.core.services.RabbitService;
 import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -25,14 +23,11 @@ public class FakerConfig {
 
     private final UserRepository userRepository;
 
-    private final RabbitService rabbitService;
-
     private final Faker faker = new Faker();
 
-    public FakerConfig(UserRepository userRepository, PasswordEncoder passwordEncoder, RabbitService rabbitService) {
+    public FakerConfig(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.rabbitService = rabbitService;
     }
 
 
@@ -116,8 +111,6 @@ public class FakerConfig {
                 rate.setRate(faker.random().nextInt(0, 100));
                 return rate;
             }).limit(100).forEach(user.getRates()::add);
-
-            rabbitService.calculateUserStats(user);
 
             Stream.generate(() -> {
                 Comment comment = new Comment();
