@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.akulinski</groupId>
-    <artifactId>keepmeawake</artifactId>
+    <artifactId>userr8meservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>keepmeawake</name>
-    <description>Demo project for Spring Boot</description>
+    <name>userr8meservice</name>
+    <description></description>
 
     <properties>
         <java.version>11</java.version>
@@ -20,6 +20,17 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+            <version>2.1.9.RELEASE</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -155,7 +166,7 @@
                         <imageTag>${project.version}</imageTag>
                         <imageTag>latest</imageTag>
                     </imageTags>
-                    <imageName>docker.pkg.github.com/akulinski/keepmeawake/app</imageName>
+                    <imageName>docker.pkg.github.com/akulinski/userr8meservice/app</imageName>
                     <dockerDirectory>docker</dockerDirectory>
                     <resources>
                         <resource>
@@ -184,8 +195,8 @@
                             <goal>tag</goal>
                         </goals>
                         <configuration>
-                            <image>docker.pkg.github.com/akulinski/keepmeawake/app</image>
-                            <newName>docker.pkg.github.com/akulinski/keepmeawake/app:${project.version}</newName>
+                            <image>docker.pkg.github.com/akulinski/userr8meservice/app</image>
+                            <newName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}</newName>
                         </configuration>
                     </execution>
                     <execution>
@@ -195,7 +206,8 @@
                             <goal>push</goal>
                         </goals>
                         <configuration>
-                            <imageName>docker.pkg.github.com/akulinski/keepmeawake/app:${project.version}</imageName>
+                            <imageName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}
+                            </imageName>
                         </configuration>
                     </execution>
                 </executions>
@@ -231,7 +243,6 @@
         </plugins>
 
     </build>
-
 
 
     <repositories>

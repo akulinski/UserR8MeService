@@ -1,7 +1,7 @@
 version: '2'
 services:
   keepmeawake-mongodb:
-    image: mongo:4.0.9
+    image: mongo:latest
     ports:
       - '27017:27017'
     volumes:
