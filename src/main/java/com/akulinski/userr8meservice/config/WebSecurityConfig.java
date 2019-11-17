@@ -27,6 +27,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService jwtUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
 
+
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
+
     public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, UserDetailsService jwtUserDetailsService, JwtRequestFilter jwtRequestFilter, CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtUserDetailsService = jwtUserDetailsService;
@@ -50,16 +58,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    /**
-     * All endpoints except auth and health
-     * are protected
-     * @param httpSecurity
-     * @throws Exception
-     */
+
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().authorizeRequests()
                 .antMatchers("/api/auth", "/actuator/health", "/activate/**")
+                .permitAll()
+                .antMatchers(AUTH_WHITELIST)
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/user")
                 .permitAll()
