@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 public class Rate implements Serializable {
 
-    private Integer rate;
+    private Double rate;
 
     private String sender;
 
