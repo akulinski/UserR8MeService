@@ -56,7 +56,7 @@ public class User implements UserDetails, Serializable, Persistable<String> {
 
     //-1 means no rates assigned
     @Field
-    private Integer currentRating = -1;
+    private Double currentRating = -1.0;
 
     @Field
     private Set<Comment> comments = new HashSet<>();

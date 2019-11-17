@@ -81,7 +81,7 @@ public class UserService {
 
         Map<String, List<Rate>> grouped = toRate.getRates().stream().collect(Collectors.groupingBy(Rate::getQuestion));
         grouped.forEach((s, rates) -> {
-            double average = rates.stream().mapToInt(Rate::getRate).average().getAsDouble();
+            double average = rates.stream().mapToDouble(Rate::getRate).average().getAsDouble();
             toRate.getRatesMap().put(s, average);
         });
 
@@ -90,9 +90,9 @@ public class UserService {
 
 
     @Cacheable(cacheNames = "rating", key = "#byUsername.id")
-    public Integer getSum(User byUsername) {
+    public Double getSum(User byUsername) {
         final var sum = byUsername.getRates().stream()
-                .map(Rate::getRate).reduce(Integer::sum).orElse(-1);
+                .map(Rate::getRate).reduce(Double::sum).orElse(-1.0);
         byUsername.setCurrentRating(sum);
 
         userRepository.save(byUsername);

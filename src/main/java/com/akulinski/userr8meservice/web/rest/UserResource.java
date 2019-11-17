@@ -89,6 +89,7 @@ public class UserResource {
 
 
     @PostMapping("/rate")
+    @Deprecated
     public ResponseEntity rateUser(@RequestBody RateDTO rateDTO, Principal principal) {
         final var toRate = userRepository.findByUsername(rateDTO.getReceiver()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", rateDTO.getReceiver()));
         final var rater = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
@@ -123,11 +124,12 @@ public class UserResource {
     }
 
     @GetMapping("/get-rating")
+    @Deprecated
     public ResponseEntity getRating(Principal principal) {
         final var byUsername = userRepository.findByUsername(principal.getName())
                 .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
 
-        final Integer sum = userService.getSum(byUsername);
+        final var sum = userService.getSum(byUsername);
         return ResponseEntity.ok(sum);
     }
 

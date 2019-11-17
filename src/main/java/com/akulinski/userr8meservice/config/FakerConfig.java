@@ -48,7 +48,7 @@ public class FakerConfig {
 
             Stream.generate(() -> {
                 Rate rate = new Rate();
-                rate.setRate(faker.random().nextInt(0, 100));
+                rate.setRate(faker.random().nextDouble());
                 return rate;
             }).limit(100).forEach(user.getRates()::add);
 
@@ -79,7 +79,7 @@ public class FakerConfig {
             Stream.generate(() -> {
                 Rate rate = new Rate();
                 rate.setSender(admin.getUsername());
-                rate.setRate(faker.random().nextInt(0, 100));
+                rate.setRate(faker.random().nextDouble());
                 return rate;
             }).limit(100).forEach(user.getRates()::add);
 
@@ -108,7 +108,7 @@ public class FakerConfig {
             Stream.generate(() -> {
                 Rate rate = new Rate();
                 rate.setSender(admin.getUsername());
-                rate.setRate(faker.random().nextInt(0, 100));
+                rate.setRate(faker.random().nextDouble());
                 return rate;
             }).limit(100).forEach(user.getRates()::add);
 
