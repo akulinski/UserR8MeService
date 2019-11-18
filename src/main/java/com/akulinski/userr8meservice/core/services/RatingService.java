@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -30,12 +31,17 @@ public class RatingService {
     }
 
     public void rateUser(String rater, RateDTO rateDTO) {
-        var receiver = userRepository.findByUsername(rateDTO.getReceiver()).orElseThrow(()->
+        var receiver = userRepository.findByUsername(rateDTO.getReceiver()).orElseThrow(() ->
                 new IllegalArgumentException(String.format("User with username: %s Not found", rateDTO.getReceiver())));
 
         var rate = new Rate(rateDTO.getRating(), rater, rateDTO.getQuestion());
         receiver.getRates().add(rate);
         userRepository.save(receiver);
 
+    }
+
+    @Cacheable(cacheNames = "rates-for-user", key = "#username")
+    public Set<Rate> getRatesForUser(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException(String.format("User with username: %s not found", username))).getRates();
     }
 }

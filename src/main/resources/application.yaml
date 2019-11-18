@@ -27,7 +27,7 @@ config:
   domain: ak.keepmeawake.com
   address: localhost
   port: 8080
-
+  host: localhost:8080/activate/
 
 cache:
   timeout: 60

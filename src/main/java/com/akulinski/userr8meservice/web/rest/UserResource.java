@@ -6,7 +6,6 @@ import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
 import com.akulinski.userr8meservice.core.domain.dto.CommentDTO;
 import com.akulinski.userr8meservice.core.domain.dto.RateDTO;
 import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
-import com.akulinski.userr8meservice.core.repository.UserRepository;
 import com.akulinski.userr8meservice.core.services.EmailService;
 import com.akulinski.userr8meservice.core.services.UserService;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -17,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.function.Supplier;
 
 /**
  * User related endpoints
@@ -31,12 +29,9 @@ public class UserResource {
 
     private final UserService userService;
 
-    private final UserRepository userRepository;
-
-    public UserResource(EmailService emailService, UserService userService, UserRepository userRepository) {
+    public UserResource(EmailService emailService, UserService userService) {
         this.emailService = emailService;
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 
     /**
@@ -64,9 +59,7 @@ public class UserResource {
      */
     @GetMapping
     public ResponseEntity<User> getCurrentProfile(Principal principal) {
-        var user = userRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException(String.format("No user with username: %s", principal.getName())));
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.getUserByUsername(principal.getName()));
     }
 
     /**
@@ -91,8 +84,8 @@ public class UserResource {
     @PostMapping("/rate")
     @Deprecated
     public ResponseEntity rateUser(@RequestBody RateDTO rateDTO, Principal principal) {
-        final var toRate = userRepository.findByUsername(rateDTO.getReceiver()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", rateDTO.getReceiver()));
-        final var rater = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
+        final var toRate = userService.getUserByUsername(rateDTO.getReceiver());
+        final var rater = userService.getUserByUsername(principal.getName());
 
         userService.addRateToUser(rateDTO, toRate, rater);
 
@@ -102,32 +95,20 @@ public class UserResource {
     @PostMapping("/comment")
     public ResponseEntity commentUser(@RequestBody CommentDTO commentDTO, Principal principal) {
 
-        final var receiver = userRepository.findByUsername(commentDTO.getReceiver())
-                .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", commentDTO.getReceiver()));
+        final var receiver = userService.getUserByUsername(commentDTO.getReceiver());
 
-        final var poster = userRepository.findByUsername(principal.getName())
-                .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
+        final var poster = userService.getUserByUsername(principal.getName());
 
-        Comment comment = createAndSaveComment(commentDTO, receiver, poster);
+        Comment comment = userService.createAndSaveComment(commentDTO, receiver, poster);
 
         return ResponseEntity.ok(comment);
     }
 
-    private Comment createAndSaveComment(@RequestBody CommentDTO commentDTO, User receiver, User poster) {
-        Comment comment = new Comment();
-        comment.setComment(commentDTO.getComment());
-        comment.setCommenter(poster.getUsername());
-
-        receiver.getComments().add(comment);
-        userRepository.save(receiver);
-        return comment;
-    }
 
     @GetMapping("/get-rating")
     @Deprecated
     public ResponseEntity getRating(Principal principal) {
-        final var byUsername = userRepository.findByUsername(principal.getName())
-                .orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName()));
+        final var byUsername = userService.getUserByUsername(principal.getName());
 
         final var sum = userService.getSum(byUsername);
         return ResponseEntity.ok(sum);
@@ -137,14 +118,9 @@ public class UserResource {
     @DeleteMapping
     @CacheEvict(cacheNames = "users")
     public ResponseEntity deleteCurrentUser(Principal principal) {
-        final var id = userRepository.findByUsername(principal.getName()).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", principal.getName())).getId();
+        userService.deleteByName(principal.getName());
 
-        userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    private Supplier<IllegalArgumentException> getIllegalArgumentExceptionSupplier(String s, String name) {
-        return () -> new IllegalArgumentException(String.format(s, name));
     }
 
 
@@ -158,27 +134,27 @@ public class UserResource {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity getAll() {
-        return ResponseEntity.ok(userRepository.findAll());
+        return ResponseEntity.ok(userService.getAll());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/id/{id}")
     public ResponseEntity findById(@PathVariable("id") String id) {
-        return ResponseEntity.ok(userRepository.findById(id).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by id %s", id)));
+        return ResponseEntity.ok(userService.getById(id));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/id/{id}")
     @CacheEvict(cacheNames = "users")
     public ResponseEntity deleteById(@PathVariable("id") String id) {
-        userRepository.deleteById(id);
+        userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/username/{username}")
     public ResponseEntity findByUsername(@PathVariable("username") String username) {
-        return ResponseEntity.ok(userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username)));
+        return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
 }

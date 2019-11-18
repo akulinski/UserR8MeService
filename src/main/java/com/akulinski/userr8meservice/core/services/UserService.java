@@ -1,10 +1,8 @@
 package com.akulinski.userr8meservice.core.services;
 
-import com.akulinski.userr8meservice.core.domain.Authority;
-import com.akulinski.userr8meservice.core.domain.AuthorityType;
-import com.akulinski.userr8meservice.core.domain.Rate;
-import com.akulinski.userr8meservice.core.domain.User;
+import com.akulinski.userr8meservice.core.domain.*;
 import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
+import com.akulinski.userr8meservice.core.domain.dto.CommentDTO;
 import com.akulinski.userr8meservice.core.domain.dto.RateDTO;
 import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
@@ -18,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +44,10 @@ public class UserService {
         return RandomStringUtils.randomAlphanumeric(30) + id;
     }
 
-
+    public User getUserByUsername(String username){
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException(String.format("No user with username: %s", username)));
+    }
     public User getUser(UserDTO userDTO) {
         User user = mapDTO(userDTO);
         Set<Authority> authorities = new HashSet<>();
@@ -88,6 +90,40 @@ public class UserService {
         userRepository.save(toRate);
     }
 
+    public Comment createAndSaveComment(CommentDTO commentDTO, User receiver, User poster) {
+        Comment comment = new Comment();
+        comment.setComment(commentDTO.getComment());
+        comment.setCommenter(poster.getUsername());
+
+        receiver.getComments().add(comment);
+        userRepository.save(receiver);
+        return comment;
+    }
+
+    public void deleteByName(String username){
+        final var id = userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username)).getId();
+
+        userRepository.deleteById(id);
+    }
+
+
+    private Supplier<IllegalArgumentException> getIllegalArgumentExceptionSupplier(String s, String name) {
+        return () -> new IllegalArgumentException(String.format(s, name));
+    }
+
+    @Cacheable(cacheNames = "by-id",key = "#id")
+    public User getById(String id){
+        return userRepository.findById(id).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by id %s", id));
+    }
+
+    public void deleteById(String id){
+        userRepository.deleteById(id);
+    }
+
+    @Cacheable(cacheNames = "all-users")
+    public List<User> getAll(){
+        return userRepository.findAll();
+    }
 
     @Cacheable(cacheNames = "rating", key = "#byUsername.id")
     public Double getSum(User byUsername) {

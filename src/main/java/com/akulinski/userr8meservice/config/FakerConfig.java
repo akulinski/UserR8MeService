@@ -49,6 +49,7 @@ public class FakerConfig {
             Stream.generate(() -> {
                 Rate rate = new Rate();
                 rate.setRate(faker.random().nextDouble());
+                rate.setQuestion(faker.beer().style());
                 return rate;
             }).limit(100).forEach(user.getRates()::add);
 
@@ -80,6 +81,7 @@ public class FakerConfig {
                 Rate rate = new Rate();
                 rate.setSender(admin.getUsername());
                 rate.setRate(faker.random().nextDouble());
+                rate.setQuestion(faker.beer().style());
                 return rate;
             }).limit(100).forEach(user.getRates()::add);
 
@@ -95,31 +97,34 @@ public class FakerConfig {
         });
 
 
-        Stream.generate(() -> {
-            User user = new User();
-            user.setUsername(faker.name().username());
-            user.setPassword(faker.name().nameWithMiddle());
-            user.setEmail(faker.yoda().quote());
-
-            Set<Authority> authorities = new HashSet<>();
-            authorities.add(new Authority(AuthorityType.USER));
-            user.setAuthorities(authorities);
+        if(userRepository.count() < 100) {
 
             Stream.generate(() -> {
-                Rate rate = new Rate();
-                rate.setSender(admin.getUsername());
-                rate.setRate(faker.random().nextDouble());
-                return rate;
-            }).limit(100).forEach(user.getRates()::add);
+                User user = new User();
+                user.setUsername(faker.name().username());
+                user.setPassword(faker.name().nameWithMiddle());
+                user.setEmail(faker.yoda().quote());
 
-            Stream.generate(() -> {
-                Comment comment = new Comment();
-                comment.setComment(faker.book().title());
-                return comment;
-            }).limit(100).forEach(user.getComments()::add);
+                Set<Authority> authorities = new HashSet<>();
+                authorities.add(new Authority(AuthorityType.USER));
+                user.setAuthorities(authorities);
 
-            return user;
-        }).limit(100).forEach(userRepository::save);
+                Stream.generate(() -> {
+                    Rate rate = new Rate();
+                    rate.setSender(admin.getUsername());
+                    rate.setRate(faker.random().nextDouble());
+                    rate.setQuestion(faker.beer().style());
+                    return rate;
+                }).limit(100).forEach(user.getRates()::add);
 
+                Stream.generate(() -> {
+                    Comment comment = new Comment();
+                    comment.setComment(faker.book().title());
+                    return comment;
+                }).limit(100).forEach(user.getComments()::add);
+
+                return user;
+            }).limit(100).forEach(userRepository::save);
+        }
     }
 }

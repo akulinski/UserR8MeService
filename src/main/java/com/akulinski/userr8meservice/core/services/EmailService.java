@@ -26,6 +26,8 @@ import java.util.Objects;
 @Slf4j
 public class EmailService {
 
+    private String host;
+
     private String domainName;
 
     private String apiKey;
@@ -39,7 +41,10 @@ public class EmailService {
     private Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
 
 
-    public EmailService(@Value("${config.apikey}") String apiKey, @Value("${config.domain}") String domainName, @Value("${config.from}") String from,@Value("${config.address}") String address,@Value("${config.port}") String port) throws IOException {
+    public EmailService(@Value("${config.host}")  String host, @Value("${config.apikey}") String apiKey, @Value("${config.domain}") String domainName,
+                        @Value("${config.from}") String from, @Value("${config.address}") String address, @Value("${config.port}") String port) throws IOException {
+
+        this.host = host;
         this.apiKey = apiKey;
         this.domainName = domainName;
         this.from = from;
@@ -64,7 +69,7 @@ public class EmailService {
                     .field("from", String.format("KeepMeAwake <%s>", from))
                     .field("to", to)
                     .field("subject", "Activate your account")
-                    .field("html", getEmail(name, "localhost:8080/activate/" + link, signature))
+                    .field("html", getEmail(name, host + link, signature))
                     .asJson();
         } catch (IOException | TemplateException e) {
             log.error(e.getMessage());

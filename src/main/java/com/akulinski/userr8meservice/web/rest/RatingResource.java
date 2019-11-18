@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,18 @@ public class RatingResource {
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    @GetMapping("/get-rates")
+    public ResponseEntity getRates(Principal principal){
+        return ResponseEntity.ok(ratingService.getRatesForUser(principal.getName()));
+    }
+
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/get-rates/{username}")
+    public ResponseEntity getRatesForUser(@PathVariable("username") String username){
+        return ResponseEntity.ok(ratingService.getRatesForUser(username));
     }
 
 }
