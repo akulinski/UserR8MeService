@@ -34,23 +34,16 @@ public class EmailService {
 
     private String from;
 
-    private String address;
-
-    private String port;
-
     private Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
 
 
-    public EmailService(@Value("${config.host}")  String host, @Value("${config.apikey}") String apiKey, @Value("${config.domain}") String domainName,
-                        @Value("${config.from}") String from, @Value("${config.address}") String address, @Value("${config.port}") String port) throws IOException {
+    public EmailService(@Value("${config.host}") String host, @Value("${config.apikey}") String apiKey, @Value("${config.domain}") String domainName,
+                        @Value("${config.from}") String from) throws IOException {
 
         this.host = host;
         this.apiKey = apiKey;
         this.domainName = domainName;
         this.from = from;
-        this.address = address;
-        this.port = port;
-
 
         cfg.setDirectoryForTemplateLoading(new File(Objects.requireNonNull(getClass().getClassLoader().getResource("templates")).getFile()));
 
@@ -60,22 +53,22 @@ public class EmailService {
     }
 
     @Async
-    public JsonNode sendMessage(String to, String name, String link, String signature) throws UnirestException {
+    public JsonNode sendMessage(String to, String name, String link, String signature) throws RuntimeException, UnirestException {
 
-        HttpResponse<JsonNode> request = null;
         try {
-            request = Unirest.post("https://api.mailgun.net/v3/" + domainName + "/messages")
+            HttpResponse<JsonNode> request = Unirest.post("https://api.mailgun.net/v3/" + domainName + "/messages")
                     .basicAuth("api", apiKey)
                     .field("from", String.format("KeepMeAwake <%s>", from))
                     .field("to", to)
                     .field("subject", "Activate your account")
                     .field("html", getEmail(name, host + link, signature))
                     .asJson();
+
+            return request.getBody();
         } catch (IOException | TemplateException e) {
             log.error(e.getMessage());
+            throw new IllegalStateException(e.getMessage());
         }
-
-        return request.getBody();
     }
 
     private String getEmail(String name, String link, String signature) throws IOException, TemplateException {
