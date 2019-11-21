@@ -1,5 +1,6 @@
 package com.akulinski.userr8meservice.core.domain;
 
+import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -52,6 +53,7 @@ public class User implements UserDetails, Serializable, Persistable<String> {
     @Field
     private Set<Rate> rates = new HashSet<>();
 
+    @Field
     private Map<String, Double> ratesMap = new HashMap();
 
     //-1 means no rates assigned
@@ -63,6 +65,14 @@ public class User implements UserDetails, Serializable, Persistable<String> {
 
     @Field
     private Set<Authority> authorities = new HashSet<>();
+
+    @Field
+    @JsonIgnore
+    private Set<UserDTO> following = new HashSet<>();
+
+    @Field
+    @JsonIgnore
+    private Set<UserDTO> followers = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

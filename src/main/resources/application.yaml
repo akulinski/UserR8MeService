@@ -1,6 +1,10 @@
 server:
   port: 8080
 
+logging:
+  file:
+    path: ./logs
+
 spring:
 
   data:

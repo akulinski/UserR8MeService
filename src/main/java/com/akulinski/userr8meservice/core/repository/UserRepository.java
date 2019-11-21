@@ -23,4 +23,6 @@ public interface UserRepository {
 
     Optional<User> findUserByLink(String link);
 
+    void deleteAll();
+
 }

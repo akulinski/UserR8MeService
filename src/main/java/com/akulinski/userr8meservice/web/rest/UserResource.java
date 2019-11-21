@@ -114,6 +114,18 @@ public class UserResource {
         return ResponseEntity.ok(sum);
     }
 
+    @GetMapping("/follow/{username}")
+    public ResponseEntity follow(Principal principal, @PathVariable("username") String username){
+        userService.followUser(principal.getName(),username);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/unfollow/{username}")
+    public ResponseEntity unFollow(Principal principal, @PathVariable("username") String username){
+        userService.unFollowUser(principal.getName(),username);
+        return ResponseEntity.ok().build();
+    }
 
     @DeleteMapping
     @CacheEvict(cacheNames = "users")

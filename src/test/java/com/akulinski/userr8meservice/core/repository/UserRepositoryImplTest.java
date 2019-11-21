@@ -4,6 +4,8 @@ import com.akulinski.userr8meservice.core.domain.Authority;
 import com.akulinski.userr8meservice.core.domain.AuthorityType;
 import com.akulinski.userr8meservice.core.domain.User;
 import com.github.javafaker.Faker;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -12,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
+import redis.embedded.RedisServer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +34,19 @@ public class UserRepositoryImplTest {
     private UserRepository userRepository;
 
     private final Faker faker = new Faker();
+
+    private RedisServer redisServer;
+
+    @Before
+    public void setUp() throws Exception {
+        redisServer = new RedisServer(6379);
+        redisServer.start();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        redisServer.stop();
+    }
 
     @Test
     public void save() {
@@ -125,5 +141,24 @@ public class UserRepositoryImplTest {
         userRepository.deleteById(user.getId());
 
         assertFalse(userRepository.findById(user.getId()).isPresent());
+    }
+
+    @Test
+    public void removeAll(){
+        User user = new User();
+        user.setUsername(faker.name().username());
+        user.setPassword(faker.name().nameWithMiddle());
+        user.setEmail(faker.yoda().quote());
+
+        Set<Authority> authorities = new HashSet<>();
+        authorities.add(new Authority(AuthorityType.USER));
+        user.setAuthorities(authorities);
+        final var count = userRepository.count();
+        userRepository.save(user);
+
+        assertEquals(count+1, userRepository.count());
+
+        userRepository.deleteAll();
+        assertEquals(0, userRepository.count());
     }
 }

@@ -22,6 +22,18 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.github.caryyu</groupId>
+            <artifactId>spring-embedded-redis-server</artifactId>
+            <version>1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>2.9.2</version>
