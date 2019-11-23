@@ -10,7 +10,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017
-      database: keepmeawake
+      database: r8meservice
       repositories:
         type: auto
   cache:
@@ -27,11 +27,9 @@ redis:
 
 config:
   apiKey: ${APIKEY:defaultvalue}
-  from: welcome@keepmeawake.com
-  domain: ak.keepmeawake.com
   address: localhost
   port: 8080
-  host: localhost:8080/activate/
-
+  url: localhost:8080/activate/
+  email: czarny.grzybiarz@gmail.com
 cache:
   timeout: 60

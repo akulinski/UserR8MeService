@@ -1,9 +1,7 @@
 package com.akulinski.userr8meservice.core.services;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
+import com.amazonaws.services.simpleemail.model.*;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -26,24 +24,25 @@ import java.util.Objects;
 @Slf4j
 public class EmailService {
 
-    private String host;
+    private static final String SUBJECT = "PLEASE ACTIVATE YOUR YOUR ACCOUNT";
 
-    private String domainName;
+    private Configuration cfg;
 
-    private String apiKey;
+    private final String url;
 
-    private String from;
+    private final String email;
 
-    private Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
+    private final AmazonSimpleEmailService amazonSimpleEmailService;
 
+    public EmailService(@Value("${config.url}") String url, AmazonSimpleEmailService amazonSimpleEmailService,
+                        @Value("${config.email}") String email) throws IOException {
+        this.url = url;
 
-    public EmailService(@Value("${config.host}") String host, @Value("${config.apikey}") String apiKey, @Value("${config.domain}") String domainName,
-                        @Value("${config.from}") String from) throws IOException {
+        this.amazonSimpleEmailService = amazonSimpleEmailService;
 
-        this.host = host;
-        this.apiKey = apiKey;
-        this.domainName = domainName;
-        this.from = from;
+        this.email = email;
+
+        cfg = new Configuration(Configuration.VERSION_2_3_29);
 
         cfg.setDirectoryForTemplateLoading(new File(Objects.requireNonNull(getClass().getClassLoader().getResource("templates")).getFile()));
 
@@ -53,18 +52,24 @@ public class EmailService {
     }
 
     @Async
-    public JsonNode sendMessage(String to, String name, String link, String signature) throws RuntimeException, UnirestException {
+    public void sendMessage(String to, String name, String link, String signature) throws RuntimeException {
 
         try {
-            HttpResponse<JsonNode> request = Unirest.post("https://api.mailgun.net/v3/" + domainName + "/messages")
-                    .basicAuth("api", apiKey)
-                    .field("from", String.format("KeepMeAwake <%s>", from))
-                    .field("to", to)
-                    .field("subject", "Activate your account")
-                    .field("html", getEmail(name, host + link, signature))
-                    .asJson();
+            SendEmailRequest request = new SendEmailRequest()
+                    .withDestination(
+                            new Destination().withToAddresses(to))
+                    .withMessage(new Message()
+                            .withBody(new Body()
+                                    .withHtml(new Content()
+                                            .withCharset("UTF-8").withData(getEmail(name, url + link, signature)))
+                                    .withText(new Content()
+                                            .withCharset("UTF-8").withData(getEmail(name, url + link, signature))))
+                            .withSubject(new Content()
+                                    .withCharset("UTF-8").withData(SUBJECT)))
 
-            return request.getBody();
+                    .withSource(this.email);
+
+            amazonSimpleEmailService.sendEmail(request);
         } catch (IOException | TemplateException e) {
             log.error(e.getMessage());
             throw new IllegalStateException(e.getMessage());
@@ -87,6 +92,4 @@ public class EmailService {
         data.put("signature", signature);
         return data;
     }
-
-
 }

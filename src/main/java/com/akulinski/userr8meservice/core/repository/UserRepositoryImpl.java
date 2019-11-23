@@ -1,8 +1,8 @@
 package com.akulinski.userr8meservice.core.repository;
 
 import com.akulinski.userr8meservice.core.domain.User;
+import com.akulinski.userr8meservice.core.exceptions.repository.DuplicateValueException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SerializationException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.sql.rowset.serial.SerialException;
 import java.util.List;
 import java.util.Optional;
 

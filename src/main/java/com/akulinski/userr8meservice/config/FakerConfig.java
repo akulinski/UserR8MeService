@@ -4,6 +4,8 @@ import com.akulinski.userr8meservice.core.domain.*;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
 import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -39,7 +41,7 @@ public class FakerConfig {
             User user = new User();
             user.setPassword(passwordEncoder.encode("admin"));
             user.setUsername("admin");
-            user.setEmail("admin");
+            user.setEmail("admin@admin.com");
 
             Set<Authority> authorities = new HashSet<>();
             authorities.add(new Authority(AuthorityType.ADMIN));
@@ -70,7 +72,7 @@ public class FakerConfig {
             User user = new User();
             user.setPassword(passwordEncoder.encode("user"));
             user.setUsername("user");
-            user.setEmail("user");
+            user.setEmail("user@user.com");
 
             Set<Authority> authorities = new HashSet<>();
             authorities.add(new Authority(AuthorityType.USER));
@@ -103,7 +105,7 @@ public class FakerConfig {
                 User user = new User();
                 user.setUsername(faker.name().username());
                 user.setPassword(faker.name().nameWithMiddle());
-                user.setEmail(faker.yoda().quote());
+                user.setEmail("email."+RandomStringUtils.randomAlphanumeric(20)+"@email.com");
 
                 Set<Authority> authorities = new HashSet<>();
                 authorities.add(new Authority(AuthorityType.USER));

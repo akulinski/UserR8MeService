@@ -3,6 +3,7 @@ package com.akulinski.userr8meservice.core.domain;
 import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -14,6 +15,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
@@ -26,16 +30,21 @@ public class User implements UserDetails, Serializable, Persistable<String> {
     private String id;
 
     @Indexed(unique = true)
+    @NotBlank
+    @NotNull
     private String username;
 
     @JsonIgnore
     @Field
+    @NotBlank
+    @NotNull
+    @Length(min = 7)
     private String password;
 
+    @NotBlank
+    @NotNull
     @Email
-/*
     @Indexed(unique = true)
-*/
     private String email;
 
     @CreatedDate
@@ -64,6 +73,8 @@ public class User implements UserDetails, Serializable, Persistable<String> {
     private Set<Comment> comments = new HashSet<>();
 
     @Field
+    @NotEmpty
+    @NotNull
     private Set<Authority> authorities = new HashSet<>();
 
     @Field
