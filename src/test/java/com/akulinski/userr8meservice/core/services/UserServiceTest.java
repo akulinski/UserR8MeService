@@ -2,7 +2,6 @@ package com.akulinski.userr8meservice.core.services;
 
 import com.akulinski.userr8meservice.core.domain.Authority;
 import com.akulinski.userr8meservice.core.domain.AuthorityType;
-import com.akulinski.userr8meservice.core.domain.User;
 import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
 import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -74,48 +72,47 @@ public class UserServiceTest {
     @Test
     public void getUserByUsernameNotNull() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("test","test","test@test.com");
+        UserDTO userDTO = new UserDTO("testttt","testT1!","test@test.com");
         userRepository.save(userService.mapDTO(userDTO));
-        assertTrue(userRepository.findByUsername("test").isPresent());
+        assertTrue(userRepository.findByUsername("testttt").isPresent());
     }
 
     @Test
     public void getUserByUsernameCorrectPassword() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("test","test","test@test.com");
+        UserDTO userDTO = new UserDTO("testtttt","test","test@test.com");
         userRepository.save(userService.mapDTO(userDTO));
-        assertTrue(passwordEncoder.matches("test", userRepository.findByUsername("test").get().getPassword()));
+        assertTrue(passwordEncoder.matches("test", userRepository.findByUsername("testtttt").get().getPassword()));
     }
 
     @Test
     public void getUser() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("test","test","test@test.com");
+        UserDTO userDTO = new UserDTO("testttt","testT1!1","test@test.com");
         userService.getUser(userDTO);
-        assertTrue(userRepository.findByUsername("test").isPresent());
-        assertEquals(1, userRepository.findByUsername("test").get().getAuthorities().stream().filter(auth -> ((Authority) auth).getAuthorityType() == AuthorityType.USER).count());
+        assertTrue(userRepository.findByUsername("testttt").isPresent());
+        assertEquals(1, userRepository.findByUsername("testttt").get().getAuthorities().stream().filter(auth -> ((Authority) auth).getAuthorityType() == AuthorityType.USER).count());
     }
 
     @Test
     public void changePassword() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("test","test","test@test.com");
+        UserDTO userDTO = new UserDTO("testtttt","testT1!","test@test.com");
         final var user = userService.getUser(userDTO);
-        assertTrue(passwordEncoder.matches("test", user.getPassword()));
-        final var changePassword = userService.changePassword("test", new ChangePasswordDTO("test", "test2"));
+        assertTrue(passwordEncoder.matches("testT1!", user.getPassword()));
+        final var changePassword = userService.changePassword("testtttt", new ChangePasswordDTO("testT1!", "testT111")); //test validation during change
         assertFalse(passwordEncoder.matches("test", changePassword.getPassword()));
-        assertTrue(passwordEncoder.matches("test2", changePassword.getPassword()));
+        assertTrue(passwordEncoder.matches("testT111", changePassword.getPassword()));
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void changePasswordThatDosntMatch() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("test","test","test@test.com");
+        UserDTO userDTO = new UserDTO("testtttt","testT1!","test@test.com");
         final var user = userService.getUser(userDTO);
-        assertTrue(passwordEncoder.matches("test", user.getPassword()));
-        userService.changePassword("test", new ChangePasswordDTO("testesdafdsa", "test2"));
-
+        assertTrue(passwordEncoder.matches("testT1!", user.getPassword()));
+        userService.changePassword("testtttt", new ChangePasswordDTO("testesdafdsa", "testT1qq"));
     }
     @Test
     public void addRateToUser() {

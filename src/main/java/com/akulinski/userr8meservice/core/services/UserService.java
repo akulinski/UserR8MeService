@@ -60,6 +60,8 @@ public class UserService {
         authorities.add(new Authority(AuthorityType.USER));
         user.setAuthorities(authorities);
 
+        user = userRepository.save(user);
+
         String link = getLinkThatIsNotPresent(user.getId());
 
         user.setLink(link);
@@ -69,7 +71,7 @@ public class UserService {
         return user;
     }
 
-    public User changePassword(String username, ChangePasswordDTO changePasswordDTO) {
+    public User changePassword(String username, ChangePasswordDTO changePasswordDTO) throws IllegalArgumentException{
         final var byUsername = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", username)));
 
         if (passwordEncoder.matches(changePasswordDTO.getOldPassword(), byUsername.getPassword())) {

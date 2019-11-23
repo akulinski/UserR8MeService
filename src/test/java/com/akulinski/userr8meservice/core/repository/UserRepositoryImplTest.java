@@ -7,6 +7,7 @@ import com.github.javafaker.Faker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import redis.embedded.RedisServer;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
@@ -37,6 +39,10 @@ public class UserRepositoryImplTest {
 
     private RedisServer redisServer;
 
+    @BeforeEach
+    public void deleteAll(){
+        userRepository.deleteAll();
+    }
     @Before
     public void setUp() throws Exception {
         redisServer = new RedisServer(6379);
@@ -51,12 +57,13 @@ public class UserRepositoryImplTest {
     @Test
     public void save() {
         var current = userRepository.count();
+        AtomicInteger counter = new AtomicInteger();
 
         Stream.generate(() -> {
             User user = new User();
             user.setUsername(faker.name().username());
             user.setPassword(faker.name().nameWithMiddle());
-            user.setEmail(faker.yoda().quote());
+            user.setEmail(faker.yoda().quote()+counter.getAndIncrement()+"@email.com");
             Set<Authority> authorities = new HashSet<>();
             authorities.add(new Authority(AuthorityType.USER));
             user.setAuthorities(authorities);
@@ -73,7 +80,7 @@ public class UserRepositoryImplTest {
         User user = new User();
         user.setUsername(faker.name().username());
         user.setPassword(faker.name().nameWithMiddle());
-        user.setEmail(faker.yoda().quote());
+        user.setEmail(faker.yoda().quote()+"@email.com");
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));
@@ -88,16 +95,18 @@ public class UserRepositoryImplTest {
     public void findAll() {
         var current = userRepository.count();
 
+        AtomicInteger counter = new AtomicInteger();
+
         Stream.generate(() -> {
             User user = new User();
             user.setUsername(faker.name().username());
             user.setPassword(faker.name().nameWithMiddle());
-            user.setEmail(faker.yoda().quote());
+            user.setEmail(faker.yoda().quote()+counter.get()+"@email.com");
 
             Set<Authority> authorities = new HashSet<>();
             authorities.add(new Authority(AuthorityType.USER));
             user.setAuthorities(authorities);
-
+            counter.getAndIncrement();
             return user;
         }).limit(10).forEach(userRepository::save);
 
@@ -111,7 +120,7 @@ public class UserRepositoryImplTest {
         User user = new User();
         user.setUsername(faker.name().username());
         user.setPassword(faker.name().nameWithMiddle());
-        user.setEmail(faker.yoda().quote());
+        user.setEmail(faker.yoda().quote()+"@email.com");
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));
@@ -127,7 +136,7 @@ public class UserRepositoryImplTest {
         User user = new User();
         user.setUsername(faker.name().username());
         user.setPassword(faker.name().nameWithMiddle());
-        user.setEmail(faker.yoda().quote());
+        user.setEmail(faker.yoda().quote()+"@email.com");
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));
@@ -148,7 +157,7 @@ public class UserRepositoryImplTest {
         User user = new User();
         user.setUsername(faker.name().username());
         user.setPassword(faker.name().nameWithMiddle());
-        user.setEmail(faker.yoda().quote());
+        user.setEmail(faker.yoda().quote()+"@email.com");
 
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));

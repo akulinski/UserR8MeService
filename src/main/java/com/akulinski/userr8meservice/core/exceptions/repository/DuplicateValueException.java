@@ -1,4 +1,4 @@
-package com.akulinski.userr8meservice.core.repository;
+package com.akulinski.userr8meservice.core.exceptions.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
