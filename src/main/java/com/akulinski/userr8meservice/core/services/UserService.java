@@ -5,14 +5,16 @@ import com.akulinski.userr8meservice.core.domain.dto.*;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -179,6 +181,7 @@ public class UserService {
     public List<RegexResponseElement> findByRegexPage(int page, String regex){
 
         Pageable pageable = PageRequest.of(page,5);
+
         return userRepository.pageRegex(regex, pageable).stream()
                 .map(usr->new RegexResponseElement(usr.getId(),usr.getUsername(),regex)).collect(Collectors.toList());
     }

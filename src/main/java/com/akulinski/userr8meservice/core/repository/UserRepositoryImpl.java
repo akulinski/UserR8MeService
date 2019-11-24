@@ -135,6 +135,7 @@ public class UserRepositoryImpl implements UserRepository {
         criteria.orOperator(Criteria.where("username").regex(regex),Criteria.where("email").regex(regex));
 
         query.addCriteria(criteria);
+
         query.with(pageable);
 
         List<User> users = mongoTemplate.find(query, User.class);
