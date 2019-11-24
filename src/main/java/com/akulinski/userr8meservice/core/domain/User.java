@@ -2,6 +2,7 @@ package com.akulinski.userr8meservice.core.domain;
 
 import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,6 +25,7 @@ import java.util.*;
 
 @Document
 @Data
+@AllArgsConstructor
 public class User implements UserDetails, Serializable, Persistable<String> {
 
     @Id
@@ -60,30 +62,39 @@ public class User implements UserDetails, Serializable, Persistable<String> {
     private Boolean isEnabled = Boolean.TRUE;
 
     @Field
-    private Set<Rate> rates = new HashSet<>();
+    private Set<Rate> rates;
 
     @Field
-    private Map<String, Double> ratesMap = new HashMap();
+    private Map<String, Double> ratesMap;
 
     //-1 means no rates assigned
     @Field
     private Double currentRating = -1.0;
 
     @Field
-    private Set<Comment> comments = new HashSet<>();
+    private Set<Comment> comments;
 
     @Field
     @NotEmpty
     @NotNull
-    private Set<Authority> authorities = new HashSet<>();
+    private Set<Authority> authorities;
 
     @Field
     @JsonIgnore
-    private Set<UserDTO> following = new HashSet<>();
+    private Set<UserDTO> following; //TODO change userDTO to some other class without password field
 
     @Field
     @JsonIgnore
-    private Set<UserDTO> followers = new HashSet<>();
+    private Set<UserDTO> followers; //TODO change userDTO to some other class without password field
+
+    public User() {
+        this.rates = new HashSet<>();
+        this.ratesMap = new HashMap<>();
+        this.comments = new HashSet<>();
+        this.authorities = new HashSet<>();
+        this.following = new HashSet<>();
+        this.followers = new HashSet<>();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

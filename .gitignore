@@ -31,5 +31,8 @@ build/
 .vscode/
 
 /docker/mongodbdata
+/docker/mongodbdata2
+/docker/mongodbdata3
 
 *.log
+/logs

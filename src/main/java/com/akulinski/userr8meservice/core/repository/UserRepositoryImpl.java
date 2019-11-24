@@ -1,15 +1,19 @@
 package com.akulinski.userr8meservice.core.repository;
 
 import com.akulinski.userr8meservice.core.domain.User;
+import com.akulinski.userr8meservice.core.domain.dto.RegexResponseElement;
 import com.akulinski.userr8meservice.core.exceptions.repository.DuplicateValueException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -106,6 +110,36 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void deleteAll() {
         mongoTemplate.dropCollection(User.class);
+    }
+
+    @Override
+    public List<User> findAllUsersByRegex(String regex) {
+
+        Query query = new Query();
+
+        Criteria criteria = new Criteria();
+
+        criteria.orOperator(Criteria.where("username").regex(regex),Criteria.where("email").regex(regex));
+
+        query.addCriteria(criteria);
+
+        return mongoTemplate.find(query, User.class);
+    }
+
+    @Override
+    public Page<User> pageRegex(String regex, Pageable pageable) {
+        Query query = new Query();
+
+        Criteria criteria = new Criteria();
+
+        criteria.orOperator(Criteria.where("username").regex(regex),Criteria.where("email").regex(regex));
+
+        query.addCriteria(criteria);
+        query.with(pageable);
+
+        List<User> users = mongoTemplate.find(query, User.class);
+
+        return PageableExecutionUtils.getPage(users, pageable, ()->mongoTemplate.count(query, User.class));
     }
 
     @Override

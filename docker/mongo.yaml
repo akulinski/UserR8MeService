@@ -1,7 +1,7 @@
 version: '2'
 services:
   r8meservice-mongodb:
-    image: mongo:latest
+    image: mongo:4.0.12
     ports:
       - '27017:27017'
     volumes:

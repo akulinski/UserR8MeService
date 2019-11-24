@@ -1,22 +1,18 @@
 package com.akulinski.userr8meservice.core.services;
 
 import com.akulinski.userr8meservice.core.domain.*;
-import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
-import com.akulinski.userr8meservice.core.domain.dto.CommentDTO;
-import com.akulinski.userr8meservice.core.domain.dto.RateDTO;
-import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
+import com.akulinski.userr8meservice.core.domain.dto.*;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -147,10 +143,9 @@ public class UserService {
         return average;
     }
 
-    @Transactional
     public void followUser(String follower, String followed) {
         final var followerUser = userRepository.findByUsername(follower).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", follower));
-        final var followedUser = userRepository.findByUsername(follower).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", followed));
+        final var followedUser = userRepository.findByUsername(followed).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", followed));
 
         followedUser.getFollowers().add(mapUser(followerUser));
         userRepository.save(followedUser);
@@ -159,7 +154,6 @@ public class UserService {
         userRepository.save(followerUser);
     }
 
-    @Transactional
     public void unFollowUser(String follower, String followed) throws IllegalArgumentException {
 
         final var followerUser = userRepository.findByUsername(follower).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", follower));
@@ -179,5 +173,18 @@ public class UserService {
         } else {
             throw new IllegalArgumentException(String.format("User %s is not followed by %s", followed, follower));
         }
+    }
+
+    @Cacheable(cacheNames = "regex-response-paged")
+    public List<RegexResponseElement> findByRegexPage(int page, String regex){
+
+        Pageable pageable = PageRequest.of(page,5);
+        return userRepository.pageRegex(regex, pageable).stream()
+                .map(usr->new RegexResponseElement(usr.getId(),usr.getUsername(),regex)).collect(Collectors.toList());
+    }
+
+    public List<RegexResponseElement> findByRegex(String regex){
+        return userRepository.findAllUsersByRegex(regex).stream()
+                .map(user -> new RegexResponseElement(user.getId(),user.getUsername(),regex)).collect(Collectors.toList());
     }
 }
