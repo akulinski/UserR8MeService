@@ -9,8 +9,8 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RateDTO implements Serializable {
-    private String receiver;
-    private Double rating;
-    private String question;
+public class RegexResponseElement implements Serializable {
+    private String id;
+    private String username;
+    private String regex;
 }

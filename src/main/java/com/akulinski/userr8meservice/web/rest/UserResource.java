@@ -115,15 +115,15 @@ public class UserResource {
     }
 
     @GetMapping("/follow/{username}")
-    public ResponseEntity follow(Principal principal, @PathVariable("username") String username){
-        userService.followUser(principal.getName(),username);
+    public ResponseEntity follow(Principal principal, @PathVariable("username") String username) {
+        userService.followUser(principal.getName(), username);
         return ResponseEntity.ok().build();
     }
 
 
     @GetMapping("/unfollow/{username}")
-    public ResponseEntity unFollow(Principal principal, @PathVariable("username") String username){
-        userService.unFollowUser(principal.getName(),username);
+    public ResponseEntity unFollow(Principal principal, @PathVariable("username") String username) {
+        userService.unFollowUser(principal.getName(), username);
         return ResponseEntity.ok().build();
     }
 
@@ -134,7 +134,6 @@ public class UserResource {
 
         return ResponseEntity.noContent().build();
     }
-
 
     /**
      * Returns all users
@@ -169,4 +168,13 @@ public class UserResource {
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
+    @GetMapping("/find/{regex}")
+    public ResponseEntity findRegexPaged(@PathVariable("regex") String regex, @RequestParam(required = false) Integer page) {
+
+        if(page == null){
+            return ResponseEntity.ok(userService.findByRegex(regex));
+        }
+
+        return ResponseEntity.ok(userService.findByRegexPage(page, regex));
+    }
 }

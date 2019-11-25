@@ -1,6 +1,7 @@
 package com.akulinski.userr8meservice.aop;
 
 import com.akulinski.userr8meservice.core.domain.User;
+import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
 import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidEmailException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidPasswordException;
@@ -22,7 +23,7 @@ public class ValidationAspect {
     private final Pattern digitPattern;
     private final Pattern specialPattern;
 
-    public static final String EMAIL_REGEX = "^(.+)@(.+)$";
+    private static final String EMAIL_REGEX = "^(.+)@(.+)$";
 
     private final Pattern emailPattern;
 
@@ -34,7 +35,7 @@ public class ValidationAspect {
         this.emailPattern = Pattern.compile(EMAIL_REGEX);
         digitPattern = Pattern.compile("[0-9]");
 
-        specialPattern = Pattern.compile ("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
+        specialPattern = Pattern.compile("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
     }
 
 
@@ -46,20 +47,33 @@ public class ValidationAspect {
         final var username = user.getUsername();
 
         if (!emailPattern.matcher(email).matches()) {
+            log.warn(String.format("Validation of email failed for: %s %s", email, joinPoint.getSignature()));
             throw new InvalidEmailException(email);
         }
 
         if (basicStringCheck(username, usernameLen)) {
+            log.warn(String.format("Validation of username failed for: %s %s", username, joinPoint.getSignature()));
             throw new InvalidUsernameException(username);
         }
     }
 
     @Before("execution(* com.akulinski.userr8meservice.core.services.UserService.getUser(..)) && args(userDTO)")
-    public void validatePassword(JoinPoint joinPoint, UserDTO userDTO){
+    public void validatePassword(UserDTO userDTO) {
 
         final var password = userDTO.getPassword();
 
         if (basicStringCheck(password, passwordLen) || passwordCheck(password)) {
+            log.warn("Validation of password failed");
+            throw new InvalidPasswordException(password);
+        }
+    }
+
+    @Before("execution(* com.akulinski.userr8meservice.core.services.UserService.changePassword(..)) && args(username,changePasswordDTO)")
+    public void validatePasswordChange(String username, ChangePasswordDTO changePasswordDTO) {
+        final var password = changePasswordDTO.getNewPassword();
+
+        if (basicStringCheck(password, passwordLen) || passwordCheck(password)) {
+            log.warn("Validation of new password failed");
             throw new InvalidPasswordException(password);
         }
     }

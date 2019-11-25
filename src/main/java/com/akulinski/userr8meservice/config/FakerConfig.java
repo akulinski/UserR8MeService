@@ -67,11 +67,11 @@ public class FakerConfig {
 
         User admin = userRepository.findByUsername("admin").get();
 
-        userRepository.findByUsername("user").ifPresentOrElse((user) -> {
+        userRepository.findByUsername("user1").ifPresentOrElse((user) -> {
         }, () -> {
             User user = new User();
             user.setPassword(passwordEncoder.encode("user"));
-            user.setUsername("user");
+            user.setUsername("user1");
             user.setEmail("user@user.com");
 
             Set<Authority> authorities = new HashSet<>();
@@ -103,7 +103,7 @@ public class FakerConfig {
 
             Stream.generate(() -> {
                 User user = new User();
-                user.setUsername(faker.name().username());
+                user.setUsername(faker.name().username()+RandomStringUtils.random(3));
                 user.setPassword(faker.name().nameWithMiddle());
                 user.setEmail("email."+RandomStringUtils.randomAlphanumeric(20)+"@email.com");
 

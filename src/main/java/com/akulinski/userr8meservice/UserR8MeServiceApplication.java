@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableCaching
 @EnableAsync
 @EnableMongoAuditing
-@EnableTransactionManagement
 public class UserR8MeServiceApplication {
 
     public static void main(String[] args) {
