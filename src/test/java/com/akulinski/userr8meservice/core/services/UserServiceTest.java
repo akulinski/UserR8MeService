@@ -102,9 +102,9 @@ public class UserServiceTest {
         UserDTO userDTO = new UserDTO("testtttt", "testT1!", "test@test.com");
         final var user = userService.getUser(userDTO);
         assertTrue(passwordEncoder.matches("testT1!", user.getPassword()));
-        final var changePassword = userService.changePassword("testtttt", new ChangePasswordDTO("testT1!", "testT111")); //test validation during change
+        final var changePassword = userService.changePassword("testtttt", new ChangePasswordDTO("testT1!", "testT111!")); //test validation during change
         assertFalse(passwordEncoder.matches("test", changePassword.getPassword()));
-        assertTrue(passwordEncoder.matches("testT111", changePassword.getPassword()));
+        assertTrue(passwordEncoder.matches("testT111!", changePassword.getPassword()));
 
     }
 
@@ -114,7 +114,7 @@ public class UserServiceTest {
         UserDTO userDTO = new UserDTO("testtttt", "testT1!", "test@test.com");
         final var user = userService.getUser(userDTO);
         assertTrue(passwordEncoder.matches("testT1!", user.getPassword()));
-        userService.changePassword("testtttt", new ChangePasswordDTO("testesdafdsa", "testT1qq"));
+        userService.changePassword("testtttt", new ChangePasswordDTO("testesdafdsa", "testT1qq!"));
     }
 
     @Test
