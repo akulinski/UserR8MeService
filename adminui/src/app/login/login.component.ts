@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
+import {LoginService} from "./login.service";
+import {LoginDto} from "./login.dto";
 
 @Component({
   selector: 'app-login',
@@ -12,13 +14,22 @@ export class LoginComponent implements OnInit {
   password: string;
   showSpinner: any;
 
-  constructor(private router: Router) { }
-
-  ngOnInit() {
+  constructor(private router: Router, private loginService: LoginService) {
   }
 
-  login(): void{
+  ngOnInit() {
+    let token = localStorage.getItem("jwttoken");
+    if (token) {
+      this.router.navigateByUrl("/user");
+    }
+  }
 
+  login(): void {
+    const loginDto = new LoginDto(this.username, this.password);
+    this.loginService.login(loginDto).subscribe(data => {
+      localStorage.setItem("jwttoken", data['jwttoken']);
+      this.router.navigateByUrl("/user");
+    });
   }
 
 }
