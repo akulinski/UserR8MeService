@@ -1,6 +1,7 @@
 package com.akulinski.userr8meservice.web.rest;
 
 import com.akulinski.userr8meservice.core.domain.dto.ExceptionDTO;
+import com.akulinski.userr8meservice.core.exceptions.validation.FollowException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidEmailException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidPasswordException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidUsernameException;
@@ -44,6 +45,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
   @ExceptionHandler(value = {InvalidUsernameException.class})
   public ResponseEntity handleInvalidUsername(InvalidUsernameException ex, WebRequest webRequest) {
+    ExceptionDTO exceptionDTO = new ExceptionDTO(ex.getMessage(), new Date().toInstant());
+    return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
+  }
+
+  @ExceptionHandler(value = {FollowException.class})
+  public ResponseEntity handleFollowException(FollowException ex, WebRequest webRequest) {
     ExceptionDTO exceptionDTO = new ExceptionDTO(ex.getMessage(), new Date().toInstant());
     return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
   }

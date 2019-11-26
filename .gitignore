@@ -47,8 +47,6 @@ build/
 # Only exists if Bazel was run
 /bazel-out
 
-# dependencies
-/adminui/node_modules
 
 # profiling files
 chrome-profiler-events*.json
@@ -84,4 +82,4 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-/adminui/node_modules/
+adminui/node_modules
