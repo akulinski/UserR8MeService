@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {UserService} from "./user.service";
+import {UserDataSource} from "./UserDataSource";
 
 @Component({
   selector: 'app-user',
@@ -6,10 +8,19 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./user.component.css']
 })
 export class UserComponent implements OnInit {
+  dataSource: UserDataSource;
+  displayedColumns = ["seqNo", "description", "duration"];
 
-  constructor() { }
+  constructor(private userService: UserService) {
+  }
 
   ngOnInit() {
+    this.dataSource = new UserDataSource(this.userService);
+    this.dataSource.loadUsers();
+  }
+
+  onRowClicked(row: any) {
+    console.log('Row clicked: ', row);
   }
 
 }

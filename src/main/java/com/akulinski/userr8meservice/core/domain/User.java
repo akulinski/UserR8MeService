@@ -81,11 +81,11 @@ public class User implements UserDetails, Serializable, Persistable<String> {
 
     @Field
     @JsonIgnore
-    private Set<UserDTO> following; //TODO change userDTO to some other class without password field
+    private Set<String> following; //TODO change userDTO to some other class without password field
 
     @Field
     @JsonIgnore
-    private Set<UserDTO> followers; //TODO change userDTO to some other class without password field
+    private Set<String> followers; //TODO change userDTO to some other class without password field
 
     public User() {
         this.rates = new HashSet<>();
