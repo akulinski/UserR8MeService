@@ -11,15 +11,16 @@ export class TokenInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-
-    request = request.clone({
-      setHeaders: {
-        Authorization: `Bearer ${localStorage.getItem("jwttoken")}`
-      }
-    });
-    return next.handle(request).pipe(tap(evt=>{
-      if(evt instanceof HttpResponse){
-        if(evt.status == 401){
+    if (localStorage.getItem("jwttoken")) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${localStorage.getItem("jwttoken")}`
+        }
+      });
+    }
+    return next.handle(request).pipe(tap(evt => {
+      if (evt instanceof HttpResponse) {
+        if (evt.status == 401) {
           this.router.navigateByUrl("/login");
         }
       }
