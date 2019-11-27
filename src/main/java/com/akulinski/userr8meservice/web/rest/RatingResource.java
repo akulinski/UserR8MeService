@@ -2,7 +2,6 @@ package com.akulinski.userr8meservice.web.rest;
 
 import com.akulinski.userr8meservice.core.domain.dto.RateDTO;
 import com.akulinski.userr8meservice.core.services.RatingService;
-import com.akulinski.userr8meservice.core.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
