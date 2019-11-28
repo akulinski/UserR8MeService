@@ -6,9 +6,11 @@ import com.akulinski.userr8meservice.core.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -28,6 +30,10 @@ public class RatingService {
         userRepository.save(user);
 
         return avg;
+    }
+
+    public Map<String, Double> getAverageOfRatesForUser(String username){
+      return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException(String.format("User with username: %s not found", username))).getRatesMap();
     }
 
     public void rateUser(String rater, RateDTO rateDTO) {

@@ -2,19 +2,16 @@ package com.akulinski.userr8meservice.web.rest;
 
 import com.akulinski.userr8meservice.core.domain.Comment;
 import com.akulinski.userr8meservice.core.domain.User;
-import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
-import com.akulinski.userr8meservice.core.domain.dto.CommentDTO;
-import com.akulinski.userr8meservice.core.domain.dto.RateDTO;
-import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
+import com.akulinski.userr8meservice.core.domain.dto.*;
 import com.akulinski.userr8meservice.core.services.EmailService;
 import com.akulinski.userr8meservice.core.services.UserService;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.security.Principal;
 
 /**
@@ -38,16 +35,16 @@ public class UserResource {
      * Creates new user, no mail
      * confirmation implemented yet
      *
-     * @param userDTO
+     * @param createUserDTO
      * @return
      */
     @PostMapping
-    public ResponseEntity createUser(@RequestBody UserDTO userDTO) throws UnirestException {
+    public ResponseEntity createUser(@RequestBody CreateUserDTO createUserDTO) {
 
-        User user = userService.getUser(userDTO);
+        User user = userService.getUser(createUserDTO);
 
         emailService.sendMessage(user.getEmail(), user.getUsername(), user.getLink(), "All Best, KeepMeAwake Team");
-        return ResponseEntity.ok(user);
+        return ResponseEntity.created(URI.create(user.getUsername())).build();
     }
 
     /**
@@ -58,8 +55,8 @@ public class UserResource {
      * @return
      */
     @GetMapping
-    public ResponseEntity<User> getCurrentProfile(Principal principal) {
-        return ResponseEntity.ok(userService.getUserByUsername(principal.getName()));
+    public ResponseEntity<UserDTO> getCurrentProfile(Principal principal) {
+        return ResponseEntity.ok(userService.getUserDTOByUsername(principal.getName()));
     }
 
     /**
@@ -84,8 +81,8 @@ public class UserResource {
     @PostMapping("/rate")
     @Deprecated
     public ResponseEntity rateUser(@RequestBody RateDTO rateDTO, Principal principal) {
-        final var toRate = userService.getUserByUsername(rateDTO.getReceiver());
-        final var rater = userService.getUserByUsername(principal.getName());
+        final var toRate = userService.getUserDTOByUsername(rateDTO.getReceiver());
+        final var rater = userService.getUserDTOByUsername(principal.getName());
 
         userService.addRateToUser(rateDTO, toRate, rater);
 
@@ -95,9 +92,9 @@ public class UserResource {
     @PostMapping("/comment")
     public ResponseEntity commentUser(@RequestBody CommentDTO commentDTO, Principal principal) {
 
-        final var receiver = userService.getUserByUsername(commentDTO.getReceiver());
+        final var receiver = userService.getUserDTOByUsername(commentDTO.getReceiver());
 
-        final var poster = userService.getUserByUsername(principal.getName());
+        final var poster = userService.getUserDTOByUsername(principal.getName());
 
         Comment comment = userService.createAndSaveComment(commentDTO, receiver, poster);
 
@@ -108,7 +105,7 @@ public class UserResource {
     @GetMapping("/get-rating")
     @Deprecated
     public ResponseEntity getRating(Principal principal) {
-        final var byUsername = userService.getUserByUsername(principal.getName());
+        final var byUsername = userService.getUserDTOByUsername(principal.getName());
 
         final var sum = userService.getSum(byUsername);
         return ResponseEntity.ok(sum);
@@ -165,7 +162,7 @@ public class UserResource {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/username/{username}")
     public ResponseEntity findByUsername(@PathVariable("username") String username) {
-        return ResponseEntity.ok(userService.getUserByUsername(username));
+        return ResponseEntity.ok(userService.getUserDTOByUsername(username));
     }
 
     @GetMapping("/find/{regex}")

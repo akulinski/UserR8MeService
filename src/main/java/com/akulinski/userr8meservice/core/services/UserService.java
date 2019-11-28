@@ -10,12 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -31,30 +27,32 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
-  public User mapDTO(UserDTO userDTO) {
+  public User mapDTO(CreateUserDTO createUserDTO) {
     User user = new User();
-    user.setUsername(userDTO.getUsername());
-    user.setEmail(userDTO.getEmail());
-    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    user.setUsername(createUserDTO.getUsername());
+    user.setEmail(createUserDTO.getEmail());
+    user.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));
     user.setIsEnabled(Boolean.FALSE);
     return user;
   }
 
-  public UserDTO mapUser(User user) {
-    return new UserDTO(user.getUsername(), user.getPassword(), user.getEmail());
+  public CreateUserDTO mapUser(User user) {
+    return new CreateUserDTO(user.getUsername(), user.getPassword(), user.getEmail());
   }
 
   private String getLinkThatIsNotPresent(String id) {
     return RandomStringUtils.randomNumeric(30) + "||" + id;
   }
 
-  public User getUserByUsername(String username) {
-    return userRepository.findByUsername(username)
+  public UserDTO getUserDTOByUsername(String username) {
+    final var user = userRepository.findByUsername(username)
       .orElseThrow(() -> new IllegalStateException(String.format("No user with username: %s", username)));
+
+    return new UserDTO(user.getUsername(), user.getCurrentRating(), user.getLink(), user.getFollowers().size(), user.getComments().size());
   }
 
-  public User getUser(UserDTO userDTO) {
-    User user = mapDTO(userDTO);
+  public User getUser(CreateUserDTO createUserDTO) {
+    User user = mapDTO(createUserDTO);
     Set<Authority> authorities = new HashSet<>();
     authorities.add(new Authority(AuthorityType.USER));
     user.setAuthorities(authorities);
@@ -84,28 +82,38 @@ public class UserService {
   }
 
 
-  public void addRateToUser(@RequestBody RateDTO rateDTO, User toRate, User rater) {
+  public void addRateToUser(RateDTO rateDTO, UserDTO toRate, UserDTO rater) {
     Rate rate = new Rate();
     rate.setRate(rateDTO.getRating());
     rate.setSender(rater.getUsername());
-    toRate.getRates().add(rate);
 
-    Map<String, List<Rate>> grouped = toRate.getRates().stream().collect(Collectors.groupingBy(Rate::getQuestion));
+    final var toRateUser = userRepository.findByUsername(toRate.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", toRate.getUsername())));
+
+    toRateUser.getRates().add(rate);
+
+    Map<String, List<Rate>> grouped = toRateUser.getRates().stream().collect(Collectors.groupingBy(Rate::getQuestion));
     grouped.forEach((s, rates) -> {
       double average = rates.stream().mapToDouble(Rate::getRate).average().getAsDouble();
-      toRate.getRatesMap().put(s, average);
+      toRateUser.getRatesMap().put(s, average);
     });
 
-    userRepository.save(toRate);
+    userRepository.save(toRateUser);
   }
 
-  public Comment createAndSaveComment(CommentDTO commentDTO, User receiver, User poster) {
+  public Comment createAndSaveComment(CommentDTO commentDTO, UserDTO receiverDTO, UserDTO posterDTO) {
     Comment comment = new Comment();
     comment.setComment(commentDTO.getComment());
-    comment.setCommenter(poster.getUsername());
+    comment.setCommenterLogin(posterDTO.getUsername());
+
+    final var receiver = userRepository.findByUsername(receiverDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", receiverDTO.getUsername())));
+    final var poster = userRepository.findByUsername(posterDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", posterDTO.getUsername())));
+
+    comment.setCommenterLink(poster.getLink());
+    comment.setTimestamp(new Date().toInstant());
 
     receiver.getComments().add(comment);
     userRepository.save(receiver);
+
     return comment;
   }
 
@@ -134,8 +142,10 @@ public class UserService {
     return userRepository.findAll();
   }
 
-  @Cacheable(cacheNames = "rating", key = "#byUsername.id")
-  public Double getSum(User byUsername) {
+  @Cacheable(cacheNames = "rating")
+  public Double getSum(UserDTO userDTO) {
+
+    final var byUsername = userRepository.findByUsername(userDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", userDTO.getUsername())));
 
     final var average = byUsername.getRates().stream()
       .mapToDouble(Rate::getRate).average().orElse(-1.0);

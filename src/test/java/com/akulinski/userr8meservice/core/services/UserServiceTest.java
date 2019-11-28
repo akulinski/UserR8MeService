@@ -3,7 +3,7 @@ package com.akulinski.userr8meservice.core.services;
 import com.akulinski.userr8meservice.core.domain.Authority;
 import com.akulinski.userr8meservice.core.domain.AuthorityType;
 import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
-import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
+import com.akulinski.userr8meservice.core.domain.dto.CreateUserDTO;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -51,22 +51,22 @@ public class UserServiceTest {
 
     @Test
     public void mapDTONotNull() {
-        UserDTO userDTO = new UserDTO("test", "test", "test@test.com");
-        final var user = userService.mapDTO(userDTO);
+        CreateUserDTO createUserDTO = new CreateUserDTO("test", "test", "test@test.com");
+        final var user = userService.mapDTO(createUserDTO);
         assertNotNull(user);
     }
 
     @Test
     public void mapDTOCorrectValues() {
-        UserDTO userDTO = new UserDTO("test", "test", "test@test.com");
-        final var user = userService.mapDTO(userDTO);
+        CreateUserDTO createUserDTO = new CreateUserDTO("test", "test", "test@test.com");
+        final var user = userService.mapDTO(createUserDTO);
         assertEquals("test", user.getUsername());
     }
 
     @Test
     public void mapDTOPasswordIsHashed() {
-        UserDTO userDTO = new UserDTO("test", "test", "test@test.com");
-        final var user = userService.mapDTO(userDTO);
+        CreateUserDTO createUserDTO = new CreateUserDTO("test", "test", "test@test.com");
+        final var user = userService.mapDTO(createUserDTO);
         assertEquals("test", user.getUsername());
         assertTrue(passwordEncoder.matches("test", user.getPassword()));
     }
@@ -74,24 +74,24 @@ public class UserServiceTest {
     @Test
     public void getUserByUsernameNotNull() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("testttt", "testT1!", "test@test.com");
-        userRepository.save(userService.mapDTO(userDTO));
+        CreateUserDTO createUserDTO = new CreateUserDTO("testttt", "testT1!", "test@test.com");
+        userRepository.save(userService.mapDTO(createUserDTO));
         assertTrue(userRepository.findByUsername("testttt").isPresent());
     }
 
     @Test
     public void getUserByUsernameCorrectPassword() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("testtttt", "test", "test@test.com");
-        userRepository.save(userService.mapDTO(userDTO));
+        CreateUserDTO createUserDTO = new CreateUserDTO("testtttt", "test", "test@test.com");
+        userRepository.save(userService.mapDTO(createUserDTO));
         assertTrue(passwordEncoder.matches("test", userRepository.findByUsername("testtttt").get().getPassword()));
     }
 
     @Test
     public void getUser() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("testttt", "testT1!1", "test@test.com");
-        userService.getUser(userDTO);
+        CreateUserDTO createUserDTO = new CreateUserDTO("testttt", "testT1!1", "test@test.com");
+        userService.getUser(createUserDTO);
         assertTrue(userRepository.findByUsername("testttt").isPresent());
         assertEquals(1, userRepository.findByUsername("testttt").get().getAuthorities().stream().filter(auth -> ((Authority) auth).getAuthorityType() == AuthorityType.USER).count());
     }
@@ -99,8 +99,8 @@ public class UserServiceTest {
     @Test
     public void changePassword() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("testtttt", "testT1!", "test@test.com");
-        final var user = userService.getUser(userDTO);
+        CreateUserDTO createUserDTO = new CreateUserDTO("testtttt", "testT1!", "test@test.com");
+        final var user = userService.getUser(createUserDTO);
         assertTrue(passwordEncoder.matches("testT1!", user.getPassword()));
         final var changePassword = userService.changePassword("testtttt", new ChangePasswordDTO("testT1!", "testT111!")); //test validation during change
         assertFalse(passwordEncoder.matches("test", changePassword.getPassword()));
@@ -111,8 +111,8 @@ public class UserServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void changePasswordThatDosntMatch() {
         userRepository.deleteAll();
-        UserDTO userDTO = new UserDTO("testtttt", "testT1!", "test@test.com");
-        final var user = userService.getUser(userDTO);
+        CreateUserDTO createUserDTO = new CreateUserDTO("testtttt", "testT1!", "test@test.com");
+        final var user = userService.getUser(createUserDTO);
         assertTrue(passwordEncoder.matches("testT1!", user.getPassword()));
         userService.changePassword("testtttt", new ChangePasswordDTO("testesdafdsa", "testT1qq!"));
     }

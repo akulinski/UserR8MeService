@@ -32,22 +32,22 @@
     <mat-spinner></mat-spinner>
   </div>
 
-  <ng-container matColumnDef="seqNo">
+  <ng-container matColumnDef="id">
     <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
     <mat-cell *matCellDef="let user">{{user.id}}</mat-cell>
   </ng-container>
 
-  <ng-container matColumnDef="description">
+  <ng-container matColumnDef="username">
     <mat-header-cell *matHeaderCellDef>Username</mat-header-cell>
     <mat-cell class="description-cell"
-              *matCellDef="let user">{{user.username}}</mat-cell>
+              *matCellDef="let user" contenteditable="true">{{user.username}}</mat-cell>
 
   </ng-container>
 
-  <ng-container matColumnDef="duration">
+  <ng-container matColumnDef="email">
     <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
     <mat-cell class="duration-cell"
-              *matCellDef="let user">{{user.email}}</mat-cell>
+              *matCellDef="let user" contenteditable="true">{{user.email}}</mat-cell>
   </ng-container>
 
   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

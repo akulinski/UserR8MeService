@@ -1,20 +1,16 @@
 package com.akulinski.userr8meservice.core.domain.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserDTO implements Serializable {
-
-    private String username;
-
-    private String password;
-
-    private String email;
-
+  private final String username;
+  private final Double currentRating;
+  private final String link;
+  private final int followersCount;
+  private final int commentsCount;
 }

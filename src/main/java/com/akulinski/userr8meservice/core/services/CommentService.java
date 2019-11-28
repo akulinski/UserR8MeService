@@ -33,7 +33,7 @@ public class CommentService {
         final var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", username)));
 
-        final var found = user.getComments().stream().filter(c -> c.equals(comment) && c.getCommenter().equals(poster)).findFirst()
+        final var found = user.getComments().stream().filter(c -> c.equals(comment) && c.getCommenterLogin().equals(poster)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(String.format("User: %s has no comment %s or poster is not owner of that comment ", username, comment)));
 
         user.getComments().remove(found);

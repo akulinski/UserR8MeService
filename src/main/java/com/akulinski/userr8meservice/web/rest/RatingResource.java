@@ -27,6 +27,11 @@ public class RatingResource {
         return ResponseEntity.ok(rateDTO);
     }
 
+    @GetMapping("/avg")
+    public ResponseEntity getAverageOfAllRates(Principal principal){
+      return ResponseEntity.ok(ratingService.getAverageOfRatesForUser(principal.getName()));
+    }
+
     @PostMapping("/rate")
     public ResponseEntity rateUser(Principal principal, @RequestBody RateDTO rateDTO) {
         try {

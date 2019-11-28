@@ -2,7 +2,7 @@ package com.akulinski.userr8meservice.aop;
 
 import com.akulinski.userr8meservice.core.domain.User;
 import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
-import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
+import com.akulinski.userr8meservice.core.domain.dto.CreateUserDTO;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidEmailException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidPasswordException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidUsernameException;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -109,7 +108,7 @@ public class ValidationAspectTest {
     @Test(expected = InvalidPasswordException.class)
     public void validateInvalidPassword() {
         userRepository.deleteAll();
-        var userDTO = new UserDTO("testtttt", "t", "test@test.com");
+        var userDTO = new CreateUserDTO("testtttt", "t", "test@test.com");
         final var user = userService.getUser(userDTO);
         assertNull(user);
     }
@@ -117,7 +116,7 @@ public class ValidationAspectTest {
     @Test(expected = InvalidPasswordException.class)
     public void checkIfFailedValidationPreventsDBSave() {
         userRepository.deleteAll();
-        var userDTO = new UserDTO("testtttt", "t", "test@test.com");
+        var userDTO = new CreateUserDTO("testtttt", "t", "test@test.com");
         final var user = userService.getUser(userDTO);
         assertNull(user);
 
@@ -127,7 +126,7 @@ public class ValidationAspectTest {
     @Test
     public void validateValidPassword() {
         userRepository.deleteAll();
-        var userDTO = new UserDTO("testtttt", "TeEsT1!2@", "test@test.com");
+        var userDTO = new CreateUserDTO("testtttt", "TeEsT1!2@", "test@test.com");
         final var user = userService.getUser(userDTO);
         assertNotNull(user);
     }
@@ -135,7 +134,7 @@ public class ValidationAspectTest {
     @Test(expected = InvalidPasswordException.class)
     public void validatePasswordChange() {
         userRepository.deleteAll();
-        var userDTO = new UserDTO("testtttt", "TeEsT1!2@", "test@test.com");
+        var userDTO = new CreateUserDTO("testtttt", "TeEsT1!2@", "test@test.com");
         userService.getUser(userDTO);
 
         var changePasswordDTO = new ChangePasswordDTO("TeEsT1!2@", "password");
@@ -145,7 +144,7 @@ public class ValidationAspectTest {
     @Test
     public void validateValidPasswordChange() {
         userRepository.deleteAll();
-        var userDTO = new UserDTO("testtttt", "TeEsT1!2@", "test@test.com");
+        var userDTO = new CreateUserDTO("testtttt", "TeEsT1!2@", "test@test.com");
         userService.getUser(userDTO);
 
         var changePasswordDTO = new ChangePasswordDTO("TeEsT1!2@", "TeEsT1!2@11");

@@ -5,13 +5,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comment implements Serializable {
 
-    private String comment;
+  private String comment;
 
-    private String commenter;
+  private String commenterLogin;
+
+  private String commenterLink;
+
+  private Instant timestamp;
 }

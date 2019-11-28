@@ -2,7 +2,7 @@ package com.akulinski.userr8meservice.aop;
 
 import com.akulinski.userr8meservice.core.domain.User;
 import com.akulinski.userr8meservice.core.domain.dto.ChangePasswordDTO;
-import com.akulinski.userr8meservice.core.domain.dto.UserDTO;
+import com.akulinski.userr8meservice.core.domain.dto.CreateUserDTO;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidEmailException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidPasswordException;
 import com.akulinski.userr8meservice.core.exceptions.validation.InvalidUsernameException;
@@ -57,10 +57,10 @@ public class ValidationAspect {
         }
     }
 
-    @Before("execution(* com.akulinski.userr8meservice.core.services.UserService.getUser(..)) && args(userDTO)")
-    public void validatePassword(UserDTO userDTO) {
+    @Before("execution(* com.akulinski.userr8meservice.core.services.UserService.getUser(..)) && args(createUserDTO)")
+    public void validatePassword(CreateUserDTO createUserDTO) {
 
-        final var password = userDTO.getPassword();
+        final var password = createUserDTO.getPassword();
 
         if (basicStringCheck(password, passwordLen) || passwordCheck(password)) {
             log.warn("Validation of password failed");
