@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/comments")
@@ -30,14 +31,14 @@ public class CommentResource {
 
     @PostMapping
     public ResponseEntity addComment(@RequestBody CommentDTO commentDTO, Principal principal) {
-        var comment = new Comment(commentDTO.getComment(), principal.getName());
+        var comment = new Comment(commentDTO.getComment(), principal.getName(),"test", new Date().toInstant());
         commentService.addCommentToUser(commentDTO.getReceiver(), comment);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public ResponseEntity deleteComment(@RequestBody CommentDTO commentDTO, Principal principal) {
-        var comment = new Comment(commentDTO.getComment(), principal.getName());
+        var comment = new Comment(commentDTO.getComment(), principal.getName(), "test", new Date().toInstant());
         commentService.removeComment(commentDTO.getReceiver(), principal.getName(), comment);
         return ResponseEntity.accepted().build();
     }
@@ -45,7 +46,7 @@ public class CommentResource {
     @DeleteMapping("/any")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity deleteCommentWithoutBeingPoster(@RequestBody CommentDTO commentDTO) {
-        var comment = new Comment(commentDTO.getComment(), commentDTO.getCommenter());
+        var comment = new Comment(commentDTO.getComment(), commentDTO.getCommenter(),"test", new Date().toInstant());
         commentService.removeComment(commentDTO.getReceiver(),comment);
         return ResponseEntity.accepted().build();
     }
