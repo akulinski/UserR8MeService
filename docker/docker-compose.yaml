@@ -10,6 +10,8 @@ services:
       - S3_BUCKETS_PHOTO=r8me-avatars-bucket
       - CONFIG_URL=172.31.41.188:8080/activate/
       - CONFIG_EMAIL=czarny.grzybiarz@gmail.com
+      - AWS_ACCESSKEY=${ACCESS_KEY}
+      - AWS_SECRETKEY=${SECRET_KEY}
     restart: on-failure
     volumes:
       - ./logs:/tmp/logs
