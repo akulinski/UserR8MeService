@@ -22,7 +22,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
   @ExceptionHandler(value = {IllegalArgumentException.class, IllegalStateException.class})
   public ResponseEntity handleConflict(RuntimeException ex, WebRequest request) {
     ExceptionDTO exceptionDTO = new ExceptionDTO("Internal Application Error ", new Date().toInstant());
-    return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
   }
 
   @ExceptionHandler(value = {MongoWriteException.class})
