@@ -3,6 +3,11 @@ FROM maven:3.6.2-jdk-11
 VOLUME /tmp
 
 ARG JAR_FILE
+ARG APPLICATION_CONFIG
+ARG TEMPLATES
+ARG FAKER
+
+
 
 COPY ${JAR_FILE} r8meuserservice.jar
 
