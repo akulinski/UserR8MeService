@@ -1,21 +1,21 @@
 version: '2'
 services:
-  keepmeawake-app:
-
-    image: docker.pkg.github.com/akulinski/keepmeawake/app:latest
-
+  r8meuserservice-app:
+    image: docker.pkg.github.com/akulinski/userr8meservice/app:latest
     environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://keepmeawake-mongodb:27017
-      - REDIS_HOST_URL=keepmeawake-redis
-
+      - SPRING_DATA_MONGODB_URI=mongodb://r8meuserservice-mongodb:27017
+      - REDIS_HOST_URL=r8meuserservice-redis
+    restart: on-failure
     ports:
       - 8080:8080
-  keepmeawake-mongodb:
+  r8meuserservice-mongodb:
+    restart: on-failure
     extends:
       file: mongo.yaml
-      service: keepmeawake-mongodb
+      service: r8meservice-mongodb
 
-  keepmeawake-redis:
+  r8meuserservice-redis:
+    restart: on-failure
     extends:
       file: redis.yaml
       service: redis
