@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.akulinski</groupId>
   <artifactId>userr8meservice</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>userr8meservice</name>
   <description></description>
 
@@ -209,12 +209,24 @@
   </dependencies>
 
   <build>
+
+    <resources>
+
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.yaml</include>
+          <include>**/*.ftl</include>
+          <include>**/*.jpg</include>
+        </includes>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
-
 
       <plugin>
         <groupId>com.spotify</groupId>

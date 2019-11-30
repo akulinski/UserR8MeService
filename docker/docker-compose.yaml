@@ -4,8 +4,17 @@ services:
     image: docker.pkg.github.com/akulinski/userr8meservice/app:latest
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://r8meuserservice-mongodb:27017
+      - SPRING_DATA_MONGODB_DATABASE=r8meuserservice
       - REDIS_HOST_URL=r8meuserservice-redis
+      - JWT_SECRET=tomeczekwodeczka
+      - S3_BUCKETS_PHOTO=r8me-avatars-bucket
+      - CONFIG_URL=172.31.41.188:8080/activate/
+      - CONFIG_EMAIL=czarny.grzybiarz@gmail.com
+      - AWS_ACCESSKEY=${ACCESS_KEY}
+      - AWS_SECRETKEY=${SECRET_KEY}
     restart: on-failure
+    volumes:
+      - ./logs:/tmp/logs
     ports:
       - 8080:8080
   r8meuserservice-mongodb:
