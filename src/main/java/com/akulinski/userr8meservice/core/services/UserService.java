@@ -4,6 +4,7 @@ import com.akulinski.userr8meservice.core.domain.*;
 import com.akulinski.userr8meservice.core.domain.dto.*;
 import com.akulinski.userr8meservice.core.exceptions.validation.FollowException;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
+import com.akulinski.userr8meservice.utils.ExceptionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,7 +69,7 @@ public class UserService {
   }
 
   public User changePassword(String username, ChangePasswordDTO changePasswordDTO) throws IllegalArgumentException {
-    final var byUsername = userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", username)));
+    final var byUsername = userRepository.findByUsername(username).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, username));
 
     if (passwordEncoder.matches(changePasswordDTO.getOldPassword(), byUsername.getPassword())) {
       byUsername.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
@@ -87,7 +87,7 @@ public class UserService {
     rate.setRate(rateDTO.getRating());
     rate.setSender(rater.getUsername());
 
-    final var toRateUser = userRepository.findByUsername(toRate.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", toRate.getUsername())));
+    final var toRateUser = userRepository.findByUsername(toRate.getUsername()).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, toRate.getUsername()));
 
     toRateUser.getRates().add(rate);
 
@@ -105,8 +105,8 @@ public class UserService {
     comment.setComment(commentDTO.getComment());
     comment.setCommenterLogin(posterDTO.getUsername());
 
-    final var receiver = userRepository.findByUsername(receiverDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", receiverDTO.getUsername())));
-    final var poster = userRepository.findByUsername(posterDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", posterDTO.getUsername())));
+    final var receiver = userRepository.findByUsername(receiverDTO.getUsername()).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, receiverDTO.getUsername()));
+    final var poster = userRepository.findByUsername(posterDTO.getUsername()).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, posterDTO.getUsername()));
 
     comment.setCommenterLink(poster.getLink());
     comment.setTimestamp(new Date().toInstant());
@@ -118,19 +118,14 @@ public class UserService {
   }
 
   public void deleteByName(String username) {
-    final var id = userRepository.findByUsername(username).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", username)).getId();
+    final var id = userRepository.findByUsername(username).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, username)).getId();
 
     userRepository.deleteById(id);
   }
 
-
-  private Supplier<IllegalArgumentException> getIllegalArgumentExceptionSupplier(String s, String name) {
-    return () -> new IllegalArgumentException(String.format(s, name));
-  }
-
   @Cacheable(cacheNames = "by-id", key = "#id")
   public User getById(String id) {
-    return userRepository.findById(id).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by id %s", id));
+    return userRepository.findById(id).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, id));
   }
 
   public void deleteById(String id) {
@@ -145,7 +140,7 @@ public class UserService {
   @Cacheable(cacheNames = "rating")
   public Double getSum(UserDTO userDTO) {
 
-    final var byUsername = userRepository.findByUsername(userDTO.getUsername()).orElseThrow(() -> new IllegalArgumentException(String.format("No user found with username: %s", userDTO.getUsername())));
+    final var byUsername = userRepository.findByUsername(userDTO.getUsername()).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, userDTO.getUsername()));
 
     final var average = byUsername.getRates().stream()
       .mapToDouble(Rate::getRate).average().orElse(-1.0);
@@ -157,8 +152,8 @@ public class UserService {
   }
 
   public void followUser(String follower, String followed) {
-    final var followerUser = userRepository.findByUsername(follower).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", follower));
-    final var followedUser = userRepository.findByUsername(followed).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", followed));
+    final var followerUser = userRepository.findByUsername(follower).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, follower));
+    final var followedUser = userRepository.findByUsername(followed).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, followed));
 
     followedUser.getFollowers().add(followerUser.getUsername());
     userRepository.save(followedUser);
@@ -167,11 +162,11 @@ public class UserService {
     userRepository.save(followerUser);
   }
 
-  public void unFollowUser(String follower, String followed) throws IllegalArgumentException {
+  public void unFollowUser(String follower, String followed) {
 
-    final var followerUser = userRepository.findByUsername(follower).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", follower));
+    final var followerUser = userRepository.findByUsername(follower).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, follower));
 
-    final var followedUser = userRepository.findByUsername(follower).orElseThrow(getIllegalArgumentExceptionSupplier("No user found by username %s", followed));
+    final var followedUser = userRepository.findByUsername(follower).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, followed));
 
     if (followedUser.getFollowers().contains(followerUser.getUsername())) {
       followedUser.getFollowers().remove(followerUser.getUsername());
