@@ -27,125 +27,128 @@ import java.util.Optional;
 @Slf4j
 public class UserRepositoryImpl implements UserRepository {
 
-    private final MongoTemplate mongoTemplate;
+  public static final String USERS = "users";
+  public static final String USERNAME = "username";
 
-    private final RedisTemplate<String, User> redisTemplate;
+  private final MongoTemplate mongoTemplate;
 
-    public UserRepositoryImpl(MongoTemplate mongoTemplate, RedisTemplate redisTemplate) {
-        this.mongoTemplate = mongoTemplate;
-        this.redisTemplate = redisTemplate;
+  private final RedisTemplate<String, User> redisTemplate;
+
+  public UserRepositoryImpl(MongoTemplate mongoTemplate, RedisTemplate redisTemplate) {
+    this.mongoTemplate = mongoTemplate;
+    this.redisTemplate = redisTemplate;
+  }
+
+  @CachePut(cacheNames = USERS, key = "#user.username")
+  @Override
+  public User save(User user) throws DuplicateValueException {
+    User save = mongoTemplate.save(user);
+    redisTemplate.opsForHash().delete(USERS, user.getUsername());
+    if (save == null) {
+      throw new DuplicateValueException(String.format("User with username: %s or email: %s exists", user.getUsername(), user.getEmail()));
+    }
+    return save;
+  }
+
+  @Override
+  public Optional<User> findByUsername(String username) {
+    User userRedis = null;
+    try {
+      userRedis = (User) redisTemplate.opsForHash().get(USERS, username);
+    } catch (RuntimeException ex) {
+      log.warn(ex.getMessage());
+    }
+    if (userRedis == null) {
+      Query query = new Query();
+      query.addCriteria(Criteria.where(USERNAME).is(username));
+
+      final var one = mongoTemplate.findOne(query, User.class);
+
+      redisTemplate.opsForHash().put(USERS, username, one);
+
+      return Optional.ofNullable(one);
     }
 
-    @CachePut(cacheNames = "users", key = "#user.id")
-    @Override
-    public User save(User user) throws DuplicateValueException {
-        User save = mongoTemplate.save(user);
+    return Optional.of((User) userRedis);
+  }
 
-        if (save == null) {
-            throw new DuplicateValueException(String.format("User with username: %s or email: %s exists", user.getUsername(), user.getEmail()));
-        }
-        return save;
-    }
+  @Cacheable(cacheNames = USERS)
+  @Override
+  public List<User> findAll() {
+    return mongoTemplate.findAll(User.class);
+  }
 
-    @Override
-    public Optional<User> findByUsername(String username) {
-        User userRedis = null;
-        try {
-            userRedis = (User) redisTemplate.opsForHash().get("users", username);
-        }catch (RuntimeException ex){
-            log.warn(ex.getMessage());
-        }
-        if (userRedis == null) {
-            Query query = new Query();
-            query.addCriteria(Criteria.where("username").is(username));
-
-            final var one = mongoTemplate.findOne(query, User.class);
-
-            redisTemplate.opsForHash().put("users", username, one);
-
-            return Optional.ofNullable(one);
-        }
-
-        return Optional.of((User) userRedis);
-    }
-
-    @Cacheable(cacheNames = "users")
-    @Override
-    public List<User> findAll() {
-        return mongoTemplate.findAll(User.class);
-    }
-
-    @Cacheable(cacheNames = "users", key = "#id")
-    @Override
-    public Optional<User> findById(String id) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(id));
-        return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
-    }
+  @Cacheable(cacheNames = USERS, key = "#id")
+  @Override
+  public Optional<User> findById(String id) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("id").is(id));
+    return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
+  }
 
 
-    @Override
-    @CacheEvict(cacheNames = "users", allEntries = true)
-    public void deleteById(String id) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(id));
-        mongoTemplate.remove(query, User.class);
-    }
+  @Override
+  @CacheEvict(cacheNames = USERS, allEntries = true)
+  public void deleteById(String id) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("id").is(id));
+    mongoTemplate.remove(query, User.class);
+  }
 
-    public boolean isLinkPresent(String link) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("link").is(link));
+  public boolean isLinkPresent(String link) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("link").is(link));
 
-        return mongoTemplate.findOne(query, User.class) != null;
-    }
+    return mongoTemplate.findOne(query, User.class) != null;
+  }
 
-    @Override
-    public Optional<User> findUserByLink(String link) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("link").is(link));
+  @Override
+  public Optional<User> findUserByLink(String link) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("link").is(link));
 
-        return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
-    }
+    return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
+  }
 
-    @Override
-    public void deleteAll() {
-        mongoTemplate.dropCollection(User.class);
-    }
+  @Override
+  public void deleteAll() {
+    mongoTemplate.dropCollection(User.class);
+  }
 
-    @Override
-    public List<User> findAllUsersByRegex(String regex) {
+  @Override
+  public List<User> findAllUsersByRegex(String regex) {
 
-        Query query = new Query();
+    Query query = new Query();
 
-        Criteria criteria = new Criteria();
+    Criteria criteria = new Criteria();
 
-        criteria.orOperator(Criteria.where("username").regex(regex),Criteria.where("email").regex(regex));
+    criteria.orOperator(Criteria.where(USERNAME).regex(regex), Criteria.where("email").regex(regex));
 
-        query.addCriteria(criteria);
+    query.addCriteria(criteria);
 
-        return mongoTemplate.find(query, User.class);
-    }
+    return mongoTemplate.find(query, User.class);
+  }
 
-    @Override
-    public Page<User> pageRegex(String regex, Pageable pageable) {
-        Query query = new Query();
+  @Override
+  public Page<User> pageRegex(String regex, Pageable pageable) {
+    Query query = new Query();
 
-        Criteria criteria = new Criteria();
+    Criteria criteria = new Criteria();
 
-        criteria.orOperator(Criteria.where("username").regex(regex),Criteria.where("email").regex(regex));
+    criteria.orOperator(Criteria.where(USERNAME).regex(regex), Criteria.where("email").regex(regex));
 
-        query.addCriteria(criteria);
+    query.addCriteria(criteria);
 
-        query.with(pageable);
+    query.with(pageable);
 
-        List<User> users = mongoTemplate.find(query, User.class);
+    List<User> users = mongoTemplate.find(query, User.class);
 
-        return PageableExecutionUtils.getPage(users, pageable, ()->mongoTemplate.count(query, User.class));
-    }
+    return PageableExecutionUtils.getPage(users, pageable, () -> mongoTemplate.count(query, User.class));
+  }
 
-    @Override
-    public int count() {
-        return mongoTemplate.findAll(User.class).size();
-    }
+  @Override
+  public int count() {
+    return mongoTemplate.findAll(User.class).size();
+  }
 
 }

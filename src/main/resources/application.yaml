@@ -15,6 +15,10 @@ spring:
         type: auto
   cache:
     type: redis
+  jta:
+    atomikos:
+      properties:
+        default-max-wait-time-on-shutdown:
 
 jwt:
   secret: ${JWT_TOKEN:tomeczekwodeczka}
@@ -26,10 +30,16 @@ redis:
 
 
 config:
-  apiKey: ${APIKEY:defaultvalue}
-  address: localhost
-  port: 8080
   url: localhost:8080/activate/
   email: czarny.grzybiarz@gmail.com
 cache:
   timeout: 60
+
+
+aws:
+  accessKey: ${ACCESS_KEY}
+  secretKey: ${SECRET_KEY}
+
+s3:
+  buckets:
+    photo: r8me-avatars-bucket
