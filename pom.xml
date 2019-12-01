@@ -203,24 +203,12 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>5.2.1.BUILD-SNAPSHOT</version>
+      <version>5.1.2.RELEASE</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
 
   <build>
-
-    <resources>
-
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.yaml</include>
-          <include>**/*.ftl</include>
-          <include>**/*.jpg</include>
-        </includes>
-      </resource>
-    </resources>
 
     <plugins>
       <plugin>
