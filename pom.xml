@@ -206,6 +206,11 @@
       <version>5.1.2.RELEASE</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.6</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -236,6 +241,7 @@
           </resources>
           <buildArgs>
             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+            <TEMPLATES>templates</TEMPLATES>
           </buildArgs>
         </configuration>
 
@@ -271,6 +277,29 @@
           </execution>
         </executions>
 
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/docker/templates</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>templates</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

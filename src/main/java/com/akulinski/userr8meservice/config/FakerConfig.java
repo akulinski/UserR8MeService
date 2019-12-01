@@ -18,10 +18,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,7 +63,7 @@ public class FakerConfig {
 
       Stream.generate(() -> {
         Comment comment = new Comment();
-        comment.setComment(faker.book().title());
+        comment.setComment(faker.witcher().quote());
         comment.setCommenterLink(faker.avatar().image());
         comment.setTimestamp(new Date().toInstant());
         return comment;
@@ -77,9 +74,9 @@ public class FakerConfig {
       Resource resource = new ClassPathResource("faker/avatar.jpg");
 
       try {
-        FileInputStream input = new FileInputStream(resource.getFile());
+        InputStream input = resource.getInputStream();
         MultipartFile multipartFile = new MockMultipartFile("file",
-          resource.getFile().getName(), "text/plain", IOUtils.toByteArray(input));
+         "avatar.jpg", "text/plain", IOUtils.toByteArray(input));
         photoService.uploadAvatar(multipartFile, "admin");
       } catch (IOException e) {
         log.error(e.getLocalizedMessage());
@@ -114,7 +111,8 @@ public class FakerConfig {
 
       Stream.generate(() -> {
         Comment comment = new Comment();
-        comment.setComment(faker.book().title());
+        comment.setCommenterLogin("admin");
+        comment.setComment(faker.lorem().sentence());
         comment.setCommenterLink(faker.avatar().image());
         comment.setTimestamp(new Date().toInstant());
         return comment;
@@ -126,9 +124,9 @@ public class FakerConfig {
       Resource resource = new ClassPathResource("faker/avatar.jpg");
 
       try {
-        FileInputStream input = new FileInputStream(resource.getFile());
+        InputStream input = resource.getInputStream();
         MultipartFile multipartFile = new MockMultipartFile("file",
-          resource.getFile().getName(), "text/plain", IOUtils.toByteArray(input));
+          "avatar.jpg", "text/plain", IOUtils.toByteArray(input));
         photoService.uploadAvatar(multipartFile, "user1");
       } catch (IOException e) {
         log.error(e.getLocalizedMessage());
@@ -158,7 +156,8 @@ public class FakerConfig {
 
         Stream.generate(() -> {
           Comment comment = new Comment();
-          comment.setComment(faker.book().title());
+          comment.setCommenterLogin("admin");
+          comment.setComment(faker.lorem().sentence());
           comment.setCommenterLink(faker.avatar().image());
           comment.setTimestamp(new Date().toInstant());
           return comment;

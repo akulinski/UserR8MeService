@@ -13,13 +13,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 
 @Service
@@ -46,9 +42,8 @@ public class EmailService {
 
     cfg = new Configuration(Configuration.VERSION_2_3_29);
 
-    Resource resource = new ClassPathResource("templates");
 
-    cfg.setDirectoryForTemplateLoading(resource.getFile());
+    cfg.setDirectoryForTemplateLoading(new File("templates"));
 
     cfg.setDefaultEncoding("UTF-8");
 

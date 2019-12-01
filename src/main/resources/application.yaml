@@ -6,7 +6,9 @@ logging:
     path: ./logs
 
 spring:
-
+  redis:
+    host: localhost
+    port: 6379
   data:
     mongodb:
       uri: mongodb://localhost:27017
@@ -23,10 +25,6 @@ spring:
 jwt:
   secret: ${JWT_TOKEN:tomeczekwodeczka}
 
-redis:
-  host:
-    url: localhost
-    port: 6379
 
 
 config:
