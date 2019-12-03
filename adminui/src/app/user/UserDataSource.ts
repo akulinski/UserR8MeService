@@ -13,7 +13,6 @@ export class UserDataSource implements DataSource<UserDto> {
   constructor(private userService: UserService) {
   }
 
-
   connect(collectionViewer: CollectionViewer): Observable<namespace.UserDto[] | ReadonlyArray<namespace.UserDto>> {
     return this.usersSubject.asObservable();
   }

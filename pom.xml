@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.akulinski</groupId>
   <artifactId>userr8meservice</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
   <name>userr8meservice</name>
   <description></description>
 

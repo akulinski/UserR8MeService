@@ -20,18 +20,10 @@ declare module namespace {
   }
 
   export interface UserDto {
-    id: string;
     username: string;
-    email: string;
     created?: any;
-    modificationDate: Date;
     link?: any;
-    isEnabled: boolean;
-    rates: Rate[];
-    ratesMap: RatesMap;
     currentRating: number;
-    comments: Comment[];
-    authorities: Authority[];
     enabled: boolean;
     accountNonExpired: boolean;
     accountNonLocked: boolean;

@@ -12,6 +12,5 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class CommentDTO implements Serializable {
     private String comment;
-    private String commenter;
     private String receiver;
 }
