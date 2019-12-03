@@ -1,7 +1,7 @@
 version: '2'
 services:
   r8meuserservice-app:
-    image: 337703985776.dkr.ecr.us-east-2.amazonaws.com/userr8meservice:0.0.3-SNAPSHOTT
+    image: 337703985776.dkr.ecr.us-east-2.amazonaws.com/userr8meservice:0.0.3-SNAPSHOT
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://r8meuserservice-mongodb:27017
       - SPRING_DATA_MONGODB_DATABASE=r8meuserservice
