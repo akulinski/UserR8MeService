@@ -13,6 +13,7 @@ services:
       - SPRING_PROFILES_ACTIVE=dev,log-web,mongo-cluster,admin-ui
       - AWS_ACCESSKEY=${ACCESS_KEY}
       - AWS_SECRETKEY=${SECRET_KEY}
+
     restart: on-failure
     volumes:
       - ./logs:/tmp/logs

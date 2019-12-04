@@ -39,7 +39,7 @@ public class CommentResource {
     return ResponseEntity.accepted().build();
   }
 
-  @DeleteMapping
+  @DeleteMapping("/admin")
   @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity deleteCommentWithoutBeingPoster(@RequestBody CommentDTO commentDTO) {
     commentService.removeComment(commentDTO.getReceiver(), commentDTO.getComment());
