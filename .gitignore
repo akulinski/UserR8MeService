@@ -83,3 +83,5 @@ testem.log
 .DS_Store
 Thumbs.db
 adminui/node_modules
+
+/pushservice/src/main/resources/google/*.json

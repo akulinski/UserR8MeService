@@ -15,7 +15,7 @@ Generate new access key download csv and set enviroment variables ACCESS_KEY and
 
 In docker folder
 
-1. docker-compose -f mongo.yaml -d 
+1. docker-compose -f mongo.yaml -d  
 
 2. docker-compose -f redis.yaml -d
 

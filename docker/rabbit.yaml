@@ -1,17 +1,16 @@
-version: '2'
+version: '3.5'
 
 services:
   rabbitmq:
     image: 'bitnami/rabbitmq:3.8'
     environment:
-      - RABBITMQ_USERNAME=user
-      - RABBITMQ_PASSWORD=user
-    network_mode: host
+      RABBITMQ_USERNAME: ${RABBITMQ_USER:-user}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-user}
     ports:
-      - '4369:4369'
-      - '5672:5672'
-      - '6379:6379'
-      - '25672:25672'
-      - '15672:15672'
+      - "4369:4369"
+      - "5672:5672"
+      - "6379:6379"
+      - "25672:25672"
+      - "15672:15672"
     volumes:
       - ./rabbit/:/data/db/
