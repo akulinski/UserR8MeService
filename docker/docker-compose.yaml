@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3'
 services:
   r8meuserservice-app:
     image: 337703985776.dkr.ecr.us-east-2.amazonaws.com/userr8meservice:0.0.3-SNAPSHOT
@@ -13,24 +13,60 @@ services:
       - SPRING_PROFILES_ACTIVE=dev,log-web,mongo-cluster,admin-ui
       - AWS_ACCESSKEY=${ACCESS_KEY}
       - AWS_SECRETKEY=${SECRET_KEY}
-
+    networks:
+      - userr8me
+      - api
     restart: on-failure
     volumes:
       - ./logs:/tmp/logs
     ports:
       - 8080:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1.2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
   r8meuserservice-mongodb:
     restart: on-failure
     image: mongo:4.0.12
+    networks:
+      - userr8me
     ports:
       - '27017:27017'
     volumes:
       - ./mongodbdata/:/data/db/
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 700M
 
   r8meuserservice-redis:
     restart: on-failure
     image: 'bitnami/redis:latest'
+    networks:
+      - userr8me
     ports:
       - '6379:6379'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+networks:
+  userr8me:
+    driver: overlay
+  api:

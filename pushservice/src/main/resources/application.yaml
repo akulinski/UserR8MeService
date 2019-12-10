@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: pushservice
+  rabbitmq:
+    username: ${RABBITMQ_USER:user}
+    password: ${RABBITMQ_PASSWORD:user}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:changeme}
+    # JPA properties
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    generate-ddl: false
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      config:
+        enabled: true
+      discovery:
+        instanceId: ${spring.application.name}:${random.value}x
+
+properties:
+  pushQueueUp: pushQueueUp
+  pushQueueDown: pushQueueDown
+  exchange: statusChangeMessage
