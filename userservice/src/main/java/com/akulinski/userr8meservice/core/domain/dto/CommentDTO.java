@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
@@ -11,6 +13,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentDTO implements Serializable {
-    private String comment;
-    private String receiver;
+
+  @NotNull
+  @NotEmpty
+  private String comment;
+
+  @NotNull
+  @NotEmpty
+  private String receiver;
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
@@ -28,9 +29,9 @@ public class CommentResource {
   }
 
   @PostMapping
-  public ResponseEntity addComment(@RequestBody CommentDTO commentDTO, Principal principal) {
-    commentService.addCommentToUser(commentDTO, principal.getName());
-    return ResponseEntity.ok().build();
+  public ResponseEntity addComment(@RequestBody @Valid CommentDTO commentDTO, Principal principal) {
+    final var user = commentService.addCommentToUser(commentDTO, principal.getName());
+    return ResponseEntity.ok(user.getComments());
   }
 
   @DeleteMapping

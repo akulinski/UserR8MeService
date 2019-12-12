@@ -1,6 +1,7 @@
 package com.akulinski.userr8meservice.core.services;
 
 import com.akulinski.userr8meservice.core.domain.Comment;
+import com.akulinski.userr8meservice.core.domain.User;
 import com.akulinski.userr8meservice.core.domain.dto.CommentDTO;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
 import com.akulinski.userr8meservice.utils.ExceptionUtils;
@@ -22,15 +23,19 @@ public class CommentService {
     return userRepository.findByUsername(username).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, username)).getComments();
   }
 
-  public void addCommentToUser(CommentDTO commentDTO, String poster) {
+  public User addCommentToUser(CommentDTO commentDTO, String poster) {
 
     final var user = userRepository.findByUsername(poster)
       .orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, poster));
 
+    final var receiver = userRepository.findByUsername(commentDTO.getReceiver())
+      .orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, commentDTO.getReceiver()));
+
     var comment = new Comment(commentDTO.getComment(), poster, user.getLink(), new Date().toInstant());
 
-    user.getComments().add(comment);
-    userRepository.save(user);
+    receiver.getComments().add(comment);
+
+    return userRepository.save(receiver);
   }
 
   public void removeComment(String username, String poster, String comment) {

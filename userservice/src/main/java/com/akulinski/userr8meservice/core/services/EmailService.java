@@ -43,7 +43,7 @@ public class EmailService {
     cfg = new Configuration(Configuration.VERSION_2_3_29);
 
 
-    cfg.setDirectoryForTemplateLoading(new File("templates"));
+    cfg.setDirectoryForTemplateLoading(new File("userservice/templates"));
 
     cfg.setDefaultEncoding("UTF-8");
 

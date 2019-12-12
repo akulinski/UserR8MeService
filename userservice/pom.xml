@@ -25,7 +25,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk</artifactId>
-      <version>1.11.632</version>
+      <version>1.11.415</version>
     </dependency>
 
     <dependency>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-ses</artifactId>
-      <version>1.11.678</version>
+      <version>1.11.415</version>
     </dependency>
 
     <dependency>
@@ -246,7 +246,7 @@
           </resources>
           <buildArgs>
             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-            <TEMPLATES>templates</TEMPLATES>
+            <TEMPLATES>userservice/templates</TEMPLATES>
           </buildArgs>
         </configuration>
 
@@ -295,7 +295,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/docker/templates</outputDirectory>
+              <outputDirectory>${basedir}/target/docker/userservice/templates</outputDirectory>
               <resources>
                 <resource>
                   <directory>templates</directory>

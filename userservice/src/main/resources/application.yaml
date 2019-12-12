@@ -8,7 +8,9 @@ logging:
 spring:
   application:
     name: userr8meservice
-
+  rabbitmq:
+    username: ${RABBITMQ_USER:user}
+    password: ${RABBITMQ_PASSWORD:user}
   cloud:
     consul:
       host: localhost
@@ -51,3 +53,9 @@ aws:
 s3:
   buckets:
     photo: r8me-avatars-bucket
+
+
+properties:
+  pushQueueUp: pushQueueUp
+  pushQueueDown: pushQueueDown
+  exchange: statusChangeMessage

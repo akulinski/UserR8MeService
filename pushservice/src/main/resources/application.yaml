@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: pushservice
@@ -31,3 +32,5 @@ properties:
   pushQueueUp: pushQueueUp
   pushQueueDown: pushQueueDown
   exchange: statusChangeMessage
+server:
+  port: 0

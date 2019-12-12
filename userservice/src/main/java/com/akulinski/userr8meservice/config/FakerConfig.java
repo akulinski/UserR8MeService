@@ -1,8 +1,10 @@
 package com.akulinski.userr8meservice.config;
 
 import com.akulinski.userr8meservice.core.domain.*;
+import com.akulinski.userr8meservice.core.domain.dto.RateDTO;
 import com.akulinski.userr8meservice.core.repository.UserRepository;
 import com.akulinski.userr8meservice.core.services.PhotoService;
+import com.akulinski.userr8meservice.core.services.RatingService;
 import com.amazonaws.util.IOUtils;
 import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ public class FakerConfig {
 
   private final UserRepository userRepository;
 
+  private final RatingService ratingService;
+
   private final Faker faker = new Faker();
 
   private final PhotoService photoService;
@@ -54,12 +58,7 @@ public class FakerConfig {
       authorities.add(new Authority(AuthorityType.USER));
       user.setAuthorities(authorities);
 
-      Stream.generate(() -> {
-        Rate rate = new Rate();
-        rate.setRate(faker.random().nextDouble());
-        rate.setQuestion(faker.beer().style());
-        return rate;
-      }).limit(100).forEach(user.getRates()::add);
+      userRepository.save(user);
 
       Stream.generate(() -> {
         Comment comment = new Comment();
@@ -69,18 +68,10 @@ public class FakerConfig {
         return comment;
       }).limit(100).forEach(user.getComments()::add);
 
+      user.setLink(faker.avatar().image());
+
       userRepository.save(user);
 
-      Resource resource = new ClassPathResource("faker/avatar.jpg");
-
-      try {
-        InputStream input = resource.getInputStream();
-        MultipartFile multipartFile = new MockMultipartFile("file",
-         "avatar.jpg", "text/plain", IOUtils.toByteArray(input));
-        photoService.uploadAvatar(multipartFile, "admin");
-      } catch (IOException e) {
-        log.error(e.getLocalizedMessage());
-      }
     });
 
 
@@ -94,19 +85,16 @@ public class FakerConfig {
       user.setEmail("user@user.com");
 
 
-
       Set<Authority> authorities = new HashSet<>();
       authorities.add(new Authority(AuthorityType.USER));
       user.setAuthorities(authorities);
 
+      userRepository.save(user);
 
       Stream.generate(() -> {
-        Rate rate = new Rate();
-        rate.setSender(admin.getUsername());
-        rate.setRate(faker.random().nextDouble());
-        rate.setQuestion(faker.beer().style());
-        return rate;
-      }).limit(100).forEach(user.getRates()::add);
+        RateDTO rateDTO = new RateDTO(user.getUsername(), faker.random().nextDouble(), faker.beer().style());
+        return rateDTO;
+      }).limit(100).forEach(dto -> ratingService.rateUser("admin", dto));
 
 
       Stream.generate(() -> {
@@ -118,19 +106,9 @@ public class FakerConfig {
         return comment;
       }).limit(100).forEach(user.getComments()::add);
 
+      user.setLink(faker.avatar().image());
 
       userRepository.save(user);
-
-      Resource resource = new ClassPathResource("faker/avatar.jpg");
-
-      try {
-        InputStream input = resource.getInputStream();
-        MultipartFile multipartFile = new MockMultipartFile("file",
-          "avatar.jpg", "text/plain", IOUtils.toByteArray(input));
-        photoService.uploadAvatar(multipartFile, "user1");
-      } catch (IOException e) {
-        log.error(e.getLocalizedMessage());
-      }
     });
 
 
@@ -145,7 +123,7 @@ public class FakerConfig {
         Set<Authority> authorities = new HashSet<>();
         authorities.add(new Authority(AuthorityType.USER));
         user.setAuthorities(authorities);
-
+        userRepository.save(user);
         Stream.generate(() -> {
           Rate rate = new Rate();
           rate.setSender(admin.getUsername());
@@ -154,14 +132,11 @@ public class FakerConfig {
           return rate;
         }).limit(100).forEach(user.getRates()::add);
 
+
         Stream.generate(() -> {
-          Comment comment = new Comment();
-          comment.setCommenterLogin("admin");
-          comment.setComment(faker.lorem().sentence());
-          comment.setCommenterLink(faker.avatar().image());
-          comment.setTimestamp(new Date().toInstant());
-          return comment;
-        }).limit(100).forEach(user.getComments()::add);
+          RateDTO rateDTO = new RateDTO(user.getUsername(), faker.random().nextDouble(), faker.beer().style());
+          return rateDTO;
+        }).limit(100).forEach(dto -> ratingService.rateUser("admin", dto));
 
         return user;
       }).limit(100).forEach(userRepository::save);

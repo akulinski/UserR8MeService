@@ -35,7 +35,7 @@ build/
 /docker/mongodbdata3
 
 *.log
-/logs
+/userservice/logs
 
 
 # See http://help.github.com/ignore-files/ for more about ignoring files.

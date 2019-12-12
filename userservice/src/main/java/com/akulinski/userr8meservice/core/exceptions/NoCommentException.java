@@ -1,7 +1,9 @@
 package com.akulinski.userr8meservice.core.exceptions;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class NoCommentException extends RuntimeException {
   private String username;
