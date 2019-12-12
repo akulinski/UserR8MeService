@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,7 +63,7 @@ public class RatingService {
     var receiver = userRepository.findByUsername(rateDTO.getReceiver()).orElseThrow(ExceptionUtils.getUserNotFoundExceptionSupplier(ExceptionUtils.NO_USER_FOUND_WITH_USERNAME_S, rateDTO.getReceiver()));
     final var oldAverage = receiver.getCurrentRating();
 
-    var rate = new Rate(rateDTO.getRating(), rater, rateDTO.getQuestion());
+    var rate = new Rate(rateDTO.getRating(), rater, rateDTO.getQuestion(), Instant.now());
     receiver.getRates().add(rate);
     receiver.getRatesMap().merge(rateDTO.getQuestion(), rateDTO.getRating(), (a, b) -> (a + b) / 2);
     final var averageOfRatesForUser = receiver.getRatesMap();

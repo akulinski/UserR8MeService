@@ -32,7 +32,6 @@ public class RatingResource {
   public ResponseEntity getAverageForProfile(Principal principal) {
     final var averageOfRatesForUser = ratingService.getAverageOfRatesForUser(principal.getName());
     final var average = averageOfRatesForUser.values().stream().mapToDouble(v -> v).average().orElseThrow(() -> new IllegalStateException("No Rates yet for user"));
-
     return ResponseEntity.ok(new ProfileAverageDTO(principal.getName(), average));
   }
 

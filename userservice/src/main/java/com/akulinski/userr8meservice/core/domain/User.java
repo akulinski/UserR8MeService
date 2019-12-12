@@ -66,7 +66,7 @@ public class User implements UserDetails, Serializable, Persistable<String> {
 
   @Field
   @JsonIgnore
-  private Set<Rate> rates;
+  private SortedSet<Rate> rates;
 
   @Field
   @JsonIgnore
@@ -78,7 +78,7 @@ public class User implements UserDetails, Serializable, Persistable<String> {
 
   @Field
   @JsonIgnore
-  private Set<Comment> comments;
+  private SortedSet<Comment> comments;
 
   @Field
   @NotEmpty
@@ -88,16 +88,16 @@ public class User implements UserDetails, Serializable, Persistable<String> {
 
   @Field
   @JsonIgnore
-  private Set<String> following; //TODO change userDTO to some other class without password field
+  private Set<String> following;
 
   @Field
   @JsonIgnore
-  private Set<String> followers; //TODO change userDTO to some other class without password field
+  private Set<String> followers;
 
   public User() {
-    this.rates = new HashSet<>();
+    this.rates = new TreeSet<>();
     this.ratesMap = new HashMap<>();
-    this.comments = new HashSet<>();
+    this.comments = new TreeSet<>();
     this.authorities = new HashSet<>();
     this.following = new HashSet<>();
     this.followers = new HashSet<>();

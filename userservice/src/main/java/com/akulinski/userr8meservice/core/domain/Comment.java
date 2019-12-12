@@ -10,7 +10,7 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment implements Serializable {
+public class Comment implements Serializable, Comparable<Comment> {
 
   private String comment;
 
@@ -18,5 +18,10 @@ public class Comment implements Serializable {
 
   private String commenterLink;
 
-  private Instant timestamp;
+  private Instant timestamp = Instant.now();
+
+  @Override
+  public int compareTo(Comment o) {
+    return this.timestamp.compareTo(o.getTimestamp());
+  }
 }
