@@ -1,0 +1,15 @@
+---
+- name: cd to project folder
+  command: cd /home/akulinski/UserR8MeService
+
+- name: checkout develop
+  command: git checkout develop
+
+- name: pull develop
+  command: git pull
+
+- name: change directory to docker
+  command: cd docker
+
+- name: deploy docker swarm
+  command: docker stack deploy -c docker-compose.yaml --resolve-image userr8me
