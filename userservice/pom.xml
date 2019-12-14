@@ -235,7 +235,7 @@
             <imageTag>${project.version}</imageTag>
             <imageTag>latest</imageTag>
           </imageTags>
-          <imageName>337703985776.dkr.ecr.us-east-2.amazonaws.com/userr8meservice</imageName>
+          <imageName>docker.pkg.github.com/akulinski/userr8meservice/app</imageName>
           <dockerDirectory>docker</dockerDirectory>
           <resources>
             <resource>
@@ -265,8 +265,8 @@
               <goal>tag</goal>
             </goals>
             <configuration>
-              <image>337703985776.dkr.ecr.us-east-2.amazonaws.com/userr8meservice:</image>
-              <newName>337703985776.dkr.ecr.us-east-2.amazonaws.com/userr8meservice:${project.version}</newName>
+              <image>docker.pkg.github.com/akulinski/userr8meservice/app:</image>
+              <newName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}</newName>
             </configuration>
           </execution>
           <execution>
@@ -276,7 +276,7 @@
               <goal>push</goal>
             </goals>
             <configuration>
-              <imageName>337703985776.dkr.ecr.us-east-2.amazonaws.com/userr8meservice:${project.version}
+              <imageName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}
               </imageName>
             </configuration>
           </execution>
