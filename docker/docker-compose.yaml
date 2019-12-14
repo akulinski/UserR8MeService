@@ -66,7 +66,7 @@ services:
           cpus: '0.25'
           memory: 256M
 
-    rabbitmq:
+  r8meuserservice-rabbitmq:
       image: 'bitnami/rabbitmq:3.8'
       environment:
         RABBITMQ_USERNAME: ${RABBITMQ_USER:-user}
@@ -86,26 +86,26 @@ services:
             cpus: '0.25'
             memory: 512M
 
-    consul-agent-1: &consul-agent
+  r8meuserservice-consul-agent-1: &consul-agent
       image: consul:latest
       networks:
         - userr8me
       command: "agent -retry-join consul-server-bootstrap -client 0.0.0.0"
 
-    consul-agent-2:
+  r8meuserservice-consul-agent-2:
       <<: *consul-agent
 
-    consul-agent-3:
+  r8meuserservice-consul-agent-3:
       <<: *consul-agent
 
-    consul-server-1: &consul-server
+  r8meuserservice-consul-server-1: &consul-server
       <<: *consul-agent
       command: "agent -server -retry-join consul-server-bootstrap -client 0.0.0.0"
 
-    consul-server-2:
+  r8meuserservice-consul-server-2:
       <<: *consul-server
 
-    consul-server-bootstrap:
+  r8meuserservice-consul-server-bootstrap:
       <<: *consul-agent
       ports:
         - "8400:8400"
