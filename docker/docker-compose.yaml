@@ -1,7 +1,7 @@
 version: '3'
 services:
   r8meuserservice-app:
-    image: gcr.io/crimetivity/userr8meservice:0.0.3-SNAPSHOT
+    image: gcr.io/crimetivity/userr8meservice:0.0.4-SNAPSHOT
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://r8meuserservice-mongodb:27017
       - SPRING_DATA_MONGODB_DATABASE=r8meuserservice

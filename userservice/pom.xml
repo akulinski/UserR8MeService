@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.akulinski</groupId>
   <artifactId>userr8meservice</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
   <name>userr8meservice</name>
   <description></description>
 
@@ -246,7 +246,7 @@
           </resources>
           <buildArgs>
             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-            <TEMPLATES>userservice/templates</TEMPLATES>
+            <TEMPLATES>templates</TEMPLATES>
           </buildArgs>
         </configuration>
 
@@ -265,7 +265,7 @@
               <goal>tag</goal>
             </goals>
             <configuration>
-              <image>gcr.io/crimetivity/userr8meservice:</image>
+              <image>gcr.io/crimetivity/userr8meservice</image>
               <newName>gcr.io/crimetivity/userr8meservice:${project.version}</newName>
             </configuration>
           </execution>
@@ -295,7 +295,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/docker/userservice/templates</outputDirectory>
+              <outputDirectory>${basedir}/target/docker/templates</outputDirectory>
               <resources>
                 <resource>
                   <directory>templates</directory>
