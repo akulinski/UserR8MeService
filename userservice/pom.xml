@@ -235,7 +235,7 @@
             <imageTag>${project.version}</imageTag>
             <imageTag>latest</imageTag>
           </imageTags>
-          <imageName>docker.pkg.github.com/akulinski/userr8meservice/app</imageName>
+          <imageName>gcr.io/crimetivity/userr8meservice</imageName>
           <dockerDirectory>docker</dockerDirectory>
           <resources>
             <resource>
@@ -265,8 +265,8 @@
               <goal>tag</goal>
             </goals>
             <configuration>
-              <image>docker.pkg.github.com/akulinski/userr8meservice/app:</image>
-              <newName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}</newName>
+              <image>gcr.io/crimetivity/userr8meservice:</image>
+              <newName>gcr.io/crimetivity/userr8meservice:${project.version}</newName>
             </configuration>
           </execution>
           <execution>
@@ -276,7 +276,7 @@
               <goal>push</goal>
             </goals>
             <configuration>
-              <imageName>docker.pkg.github.com/akulinski/userr8meservice/app:${project.version}
+              <imageName>gcr.io/crimetivity/userr8meservice:${project.version}
               </imageName>
             </configuration>
           </execution>
