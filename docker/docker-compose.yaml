@@ -18,16 +18,16 @@ services:
       - api
     restart: on-failure
     volumes:
-      - ./logs:/tmp/logs
+      - /var/log/userr8meservice/logs:/tmp/logs
     ports:
       - 8080:8080
     deploy:
       resources:
         limits:
-          cpus: '0.75'
-          memory: 1.2G
+          cpus: '1.5'
+          memory: 1.5G
         reservations:
-          cpus: '0.5'
+          cpus: '1'
           memory: 1G
 
   r8meuserservice-mongodb:
@@ -38,19 +38,21 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - ./mongodbdata/:/data/db/
+      - /var/mongo/data:/data/db/
     deploy:
       resources:
         limits:
           cpus: '2'
-          memory: 1G
+          memory: 1.5G
         reservations:
-          cpus: '1'
-          memory: 700M
+          cpus: '1.5'
+          memory: 1G
 
   r8meuserservice-redis:
     restart: on-failure
-    image: 'bitnami/redis:latest'
+    image: bitnami/redis:5.0-centos-7
+    volumes:
+      - /var/data/redis:/bitnami/redis/data
     networks:
       - userr8me
     ports:
@@ -60,11 +62,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 512M
+          cpus: '1'
+          memory: 1G
         reservations:
-          cpus: '0.25'
-          memory: 256M
+          cpus: '0.5'
+          memory: 512M
 
   r8meuserservice-rabbitmq:
       image: 'bitnami/rabbitmq:3.8'
@@ -79,11 +81,11 @@ services:
         - "25672:25672"
         - "15672:15672"
       volumes:
-        - ./rabbit/:/data/db/
+        - /var/data/rabbit/:/data/db/
       deploy:
         resources:
           limits:
-            cpus: '0.25'
+            cpus: '1'
             memory: 512M
 
   r8meuserservice-consul-agent-1: &consul-agent
