@@ -90,6 +90,7 @@ public class UserResource {
     }
 
     @PostMapping("/comment")
+    @Deprecated
     public ResponseEntity commentUser(@RequestBody CommentDTO commentDTO, Principal principal) {
 
         final var receiver = userService.getUserDTOByUsername(commentDTO.getReceiver());

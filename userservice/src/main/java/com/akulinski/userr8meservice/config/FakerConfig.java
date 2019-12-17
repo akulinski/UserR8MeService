@@ -138,6 +138,7 @@ public class FakerConfig {
           return rateDTO;
         }).limit(100).forEach(dto -> ratingService.rateUser("admin", dto));
 
+        user.setLink(faker.avatar().image());
         return user;
       }).limit(100).forEach(userRepository::save);
     }
